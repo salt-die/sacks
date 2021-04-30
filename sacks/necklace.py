@@ -49,7 +49,7 @@ class Necklace:
     def __getitem__(self, key):
         l = len(self)
         if isinstance(key, slice):
-            return tuple(self._items[i % l)] for i in range(key.start or 0, key.stop or l, key.step or 1))
+            return tuple(self._items[i % l] for i in range(key.start or 0, key.stop or l, key.step or 1))
         else:
             return self._items[key % l]
 
