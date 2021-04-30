@@ -1,13 +1,12 @@
 class Necklace:
     """
-    Necklaces are immutable sequences that "wrap-around", e.g.,
-    (1, 2, 3, 4) == (3, 4, 1, 2) is true, but (1, 2, 3, 4) == (1, 2, 4, 3) is not.
+    `Necklace`s are immutable sequences that "wrap-around".
 
     Because `Necklaces` wrap, `__getitem__` slices will also wrap.
 
     Notes
     -----
-    To facilitate fast comparison of Necklaces, they store their canonical form (specifically, the least shift).
+    To facilitate fast equality comparisons, `Necklace`s store their canonical form (specifically, the least shift).
 
     Example
     -------
