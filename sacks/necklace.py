@@ -1,7 +1,6 @@
 class Necklace:
     """
-    `Necklace`s are immutable sequences that "wrap-around".  Two necklaces `n`, `m` are equal if `n == m[i:] + m[:i]` for some `i`.
-    (see https://en.wikipedia.org/wiki/Necklace_(combinatorics) )
+    `Necklace`s are immutable sequences that "wrap-around". [https://en.wikipedia.org/wiki/Necklace_(combinatorics)]
 
     Because `Necklaces` wrap, `__getitem__` slices will also wrap.
 
