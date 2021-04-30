@@ -6,7 +6,7 @@ class Necklace:
 
     Notes
     -----
-    To facilitate fast equality comparisons, `Necklace`s store their canonical form (specifically, the least shift).
+    To facilitate fast equality comparisons, `Necklace`s store their canonical form in the attribute `least_shift`.
 
     Example
     -------
@@ -16,6 +16,8 @@ class Necklace:
     True
     >>> n[-3: 15: 2]
     (2, 0, 2, 0, 2, 0, 2, 0, 2)
+
+    (Note that despite equality of `n` and `m`, their indexing won't be equal.)
     ```
     """
     __slots__ = '_items', 'least_shift'
@@ -49,7 +51,10 @@ class Necklace:
     def __getitem__(self, key):
         l = len(self)
         if isinstance(key, slice):
-            return tuple(self._items[i % l] for i in range(key.start or 0, key.stop or l, key.step or 1))
+            start = 0 if key.start is None else key.start
+            stop = l if key.stop is None else key.stop
+            step = 1 if key.step is None else key.step
+            return tuple(self._items[i % l] for i in range(start, stop, step))
         else:
             return self._items[key % l]
 
