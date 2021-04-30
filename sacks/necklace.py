@@ -18,7 +18,7 @@ class Necklace:
     (2, 0, 2, 0, 2, 0, 2, 0, 2)
     ```
     """
-    __slots__ = 'least_shift', '_items'
+    __slots__ = '_items', 'least_shift'
 
     def __new__(cls, iterable):
         items = tuple(iterable)
