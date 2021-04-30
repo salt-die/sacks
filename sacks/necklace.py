@@ -47,10 +47,11 @@ class Necklace:
         return not self == other
 
     def __getitem__(self, key):
+        l = len(self)
         if isinstance(key, slice):
-            return tuple(self._items[i % len(self)] for i in range(key.start or 0, key.stop or len(self), key.step or 1))
+            return tuple(self._items[i % l)] for i in range(key.start or 0, key.stop or l, key.step or 1))
         else:
-            return self._items[key % len(self)]
+            return self._items[key % l]
 
     def __repr__(self):
         return f'{type(self).__name__}{self._items!r}'
