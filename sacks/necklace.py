@@ -21,15 +21,16 @@ class Necklace:
     (Note that despite equality of `n` and `m`, their indexing won't be equal.)
     ```
     """
-    __slots__ = '_items', 'least_shift'
+    __slots__ = '_items', 'least_shift', 'aperiodic'
 
     def __new__(cls, iterable):
         items = tuple(iterable)
-        least_shift = min(items[i:] + items[:i] for i in range(len(items)))
+        shifts = set(items[i:] + items[:i] for i in range(len(items)))
 
         necklace = super().__new__(cls)
         super().__setattr__(necklace, '_items', items)
-        super().__setattr__(necklace, 'least_shift', least_shift)
+        super().__setattr__(necklace, 'least_shift', min(shifts))
+        super().__setattr__(necklace, 'aperiodic', len(shifts) == len(items))
         return necklace
 
     def __setattr__(self, attr, value):
