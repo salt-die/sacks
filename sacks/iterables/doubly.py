@@ -8,12 +8,9 @@ class DoublyLinkedList(Reversible):
     """
     __slots__ = 'root'
 
-    def __init__(self, iterable=None):
+    def __init__(self, iterable=()):
         self.root = Block()
-
-        if iterable:
-            for item in iterable:
-                self.append(item)
+        self.extend(iterable)
 
     def __iter__(self):
         current = self.root.next
@@ -32,6 +29,14 @@ class DoublyLinkedList(Reversible):
 
     def appendleft(self, val):
         return Block(val, prev=self.root, next=self.root.next)
+
+    def extend(self, iterable):
+        for item in iterable:
+            self.append(item)
+
+    def extendleft(self, iterable):
+        for item in iterable:
+            self.appendleft(item)
 
     def pop(self):
         if self.root.prev is self.root:
