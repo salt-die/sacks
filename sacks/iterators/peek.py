@@ -1,10 +1,11 @@
 from collections import deque
 from collections.abc import Iterator
 
+RAISE = object()
+
 
 class Peek(Iterator):
-    """
-    An iterator-wrapper that allows one to peek at the next items without consuming them.
+    """An iterator-wrapper that allows one to peek at the next items without consuming them.
     """
     def __init__(self, iterable):
         self.iterable = iter(iterable)
@@ -24,21 +25,37 @@ class Peek(Iterator):
 
         return True
 
-    def peek(self, n=1):
+    def peek(self, n=1, default=RAISE):
         """
         For `n == 1`, returns the next item without consuming it.
 
         For `n > 1`, returns the next n items (as a tuple) without consuming them.
 
-        Raises StopIteration
+        Provide a `default` value to suppress StopIteration.
+
+        Raises
+        ------
+        StopIteration if `n` larger than items left in iterable and no default provided.
         """
-        while len(self._peeked) < n:
-            self._peeked.append(next(self.iterable))
+        peeked = self._peeked
+
+        try:
+            while len(peeked) < n:
+                peeked.append(next(self.iterable))
+
+        except StopIteration:
+            if default is RAISE:
+                raise
+
+            if n == 1:
+                return default
+
+            return *peeked, *(default for _ in range(n - len(peeked)))
 
         if n == 1:
-            return self._peeked[0]
+            return peeked[0]
 
-        return tuple(self._peeked[i] for i in range(n))
+        return tuple(peeked[i] for i in range(n))
 
     def __repr__(self):
         return f'{type(self).__name__}({self.iterable!r})'
