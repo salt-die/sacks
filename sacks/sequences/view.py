@@ -2,8 +2,7 @@ from collections.abc import MutableSequence
 
 
 class View(MutableSequence):
-    """
-    A mutable view of a sequence.
+    """A mutable view of a sequence.
     """
     __slots__ = 'sequence', 'range'
 
