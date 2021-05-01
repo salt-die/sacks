@@ -9,9 +9,9 @@ class OrderedSet(MutableSet):
     def __init__(self, iterable=None):
         self._item_map = { }
         self._item_seq = DoublyLinkedList()
+
         if iterable:
-            for item in iterable:
-                self.add(item)
+            self |= iterable
 
     def __contains__(self, item):
         return item in self._item_map
