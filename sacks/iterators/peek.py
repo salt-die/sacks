@@ -55,7 +55,8 @@ class Peek(Iterator):
         if n == 1:
             return peeked[0]
 
-        return tuple(peeked[i] for i in range(n))
+        it = iter(peeked)
+        return tuple(next(it) for _ in range(n))
 
     def __repr__(self):
         return f'{type(self).__name__}({self.iterable!r})'
