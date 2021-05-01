@@ -7,14 +7,15 @@ class IndexedSet(MutableSet, Sequence):  # We can't inherit MutableSequence as t
 
     Notes
     -----
-    Removals are O(n) and we make no attempt to micro-optimize them.  Perhaps consider `OrderedSet` instead if you want O(1) removals.
+    Removals are O(n) and we make no attempt to micro-optimize them (Internal list will be resized). Consider `OrderedSet` for O(1) removals.
     """
-    def __init__(self, iterable):
+    def __init__(self, iterable=None):
         self._items = set( )
         self._item_seq = [ ]
 
-        for item in iterable:
-            self.add(item)
+        if iterable:
+            for item in iterable:
+                self.add(item)
 
     def count(self, item):  # Silly, but still a better version than mix-in
         return int(item in self)
