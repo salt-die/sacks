@@ -24,7 +24,7 @@ class Peek(Iterator):
 
         return True
 
-    def peek(n=1):
+    def peek(self, n=1):
         """
         For `n == 1`, returns the next item without consuming it.
 
