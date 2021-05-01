@@ -3,9 +3,9 @@ from collections.abc import MutableSet
 
 class Setch(MutableSet):
     """
-    Set with choice.  Setch.
+    A set with choice.
 
-    Exposes a sequence of the items of this set, `as_sequence`, that one can use with the
+    Exposes a sequence of the items of the set, `as_sequence`, that one can use with the
     `random` module's `choice`, `choices`, and `sample` functions. This sequence is efficiently
     maintained (though order is not maintained) as the set is mutated.
     """

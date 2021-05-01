@@ -4,7 +4,7 @@ from ..primitives import Block
 
 
 class DoublyLinkedList(Reversible):
-    """A DoublyLinkedList implementation for use with higher-order collections.  Appends return the underlying block primitives.
+    """A doubly-linked list implementation for use with higher-order collections.  Appends return the underlying block primitives.
     """
     __slots__ = 'root'
 

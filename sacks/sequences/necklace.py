@@ -2,7 +2,7 @@ from collections.abc import Sequence
 
 class Necklace(Sequence):
     """
-    `Necklace`s are immutable sequences that "wrap-around". [https://en.wikipedia.org/wiki/Necklace_(combinatorics)]
+    An immutable sequence that "wraps-around". [https://en.wikipedia.org/wiki/Necklace_(combinatorics)]
 
     Because `Necklace`s wrap, `__getitem__` slices will also wrap.
 

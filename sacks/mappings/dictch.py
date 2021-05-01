@@ -4,7 +4,7 @@ from ..sets import Setch
 
 class Dictch(MutableMapping):
     """
-    Dict with choice.  Dictch.
+    A dict with choice.
 
     Exposes a sequence of the keys of this mapping, `as_sequence`, that one can use with the
     `random` module's `choice`, `choices`, and `sample` functions. This sequence is efficiently
