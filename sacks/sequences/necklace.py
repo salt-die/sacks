@@ -23,7 +23,7 @@ class Necklace(Sequence):
     """
     __slots__ = '_items', 'least_shift', 'aperiodic'
 
-    def __new__(cls, iterable):
+    def __new__(cls, iterable=()):
         items = tuple(iterable)
         shifts = set(items[i:] + items[:i] for i in range(len(items)))
 

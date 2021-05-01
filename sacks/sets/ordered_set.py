@@ -6,12 +6,11 @@ from ..iterables import DoublyLinkedList
 class OrderedSet(MutableSet):
     """An ordered set.
     """
-    def __init__(self, iterable=None):
+    def __init__(self, iterable=()):
         self._item_map = { }
         self._item_seq = DoublyLinkedList()
 
-        if iterable:
-            self |= iterable
+        self |= iterable
 
     def __contains__(self, item):
         return item in self._item_map
