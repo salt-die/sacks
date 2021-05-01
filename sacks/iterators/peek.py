@@ -3,6 +3,9 @@ from collections.abc import Iterator
 
 
 class Peek(Iterator):
+    """
+    An iterator-wrapper that allows one to peek at the next items without consuming them.
+    """
     def __init__(self, iterable):
         self.iterable = iter(iterable)
         self._peeked = deque()
