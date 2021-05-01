@@ -1,8 +1,10 @@
-class Necklace:
+from collections.abc import Sequence
+
+class Necklace(Sequence):
     """
     `Necklace`s are immutable sequences that "wrap-around". [https://en.wikipedia.org/wiki/Necklace_(combinatorics)]
 
-    Because `Necklaces` wrap, `__getitem__` slices will also wrap.
+    Because `Necklace`s wrap, `__getitem__` slices will also wrap.
 
     Notes
     -----
@@ -16,9 +18,8 @@ class Necklace:
     True
     >>> n[-3: 15: 2]
     (2, 0, 2, 0, 2, 0, 2, 0, 2)
-
-    (Note that despite equality of `n` and `m`, their indexing won't be equal.)
     ```
+    Note that despite equality of `n` and `m`, their indexing won't be equal.
     """
     __slots__ = '_items', 'least_shift', 'aperiodic'
 
