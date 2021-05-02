@@ -9,6 +9,8 @@ class IndexedSet(MutableSet, Sequence):  # We can't inherit MutableSequence as t
     -----
     Removals are O(n) and we make no attempt to micro-optimize them (internal list will be resized). Consider `OrderedSet` for O(1) removals.
     """
+    __slots__ = '_items', '_item_seq',
+
     def __init__(self, iterable=()):
         self._items = set( )
         self._item_seq = [ ]

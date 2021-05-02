@@ -1,7 +1,7 @@
 class Block:
     """Primitive element of a doubly-linked list.
     """
-    __slots__ = 'val', 'prev', 'next'
+    __slots__ = 'val', 'prev', 'next',
 
     def __init__(self, val=None, prev=None, next=None):
         self.val = val

@@ -21,7 +21,7 @@ class Necklace(Sequence):
     ```
     Note that despite equality of `n` and `m`, their indexing won't be equal.
     """
-    __slots__ = '_items', 'least_shift', 'aperiodic'
+    __slots__ = '_items', 'least_shift', 'aperiodic',
 
     def __new__(cls, iterable=()):
         items = tuple(iterable)

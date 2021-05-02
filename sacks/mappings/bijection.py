@@ -7,7 +7,7 @@ class Bijection(MutableMapping):
 
     `reverse` method will swap maps to allow reverse lookup.
     """
-    __slots__ = '_map', '_reverse_map'
+    __slots__ = '_map', '_reverse_map',
 
     def __init__(self, *args, **kwargs):
         self._map = { }

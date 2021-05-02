@@ -6,7 +6,7 @@ from ..primitives import Block
 class DoublyLinkedList(Reversible):
     """A doubly-linked list implementation for use with higher-order collections.  Appends return the underlying block primitives.
     """
-    __slots__ = 'root'
+    __slots__ = 'root',
 
     def __init__(self, iterable=()):
         self.root = Block()

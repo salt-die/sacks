@@ -5,7 +5,7 @@ from bitarray import bitarray
 class BloomFilter(Container):
     """A memory-efficient data structure with probabalistic membership checks.
     """
-    __slots__ = '_bitarray', '_nhashes'
+    __slots__ = '_bitarray', '_nhashes',
 
     def __init__(self, iterable=(), / , size=2**16, hashes=2**3):
         self._bitarray = bitarray(size)

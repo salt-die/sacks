@@ -6,6 +6,8 @@ from ..iterables import DoublyLinkedList
 class OrderedSet(MutableSet):
     """An ordered set.
     """
+    __slots__ = '_item_map', '_item_seq',
+
     def __init__(self, iterable=()):
         self._item_map = { }
         self._item_seq = DoublyLinkedList()

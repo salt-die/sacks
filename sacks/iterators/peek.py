@@ -7,6 +7,8 @@ RAISE = object()
 class Peek(Iterator):
     """An iterator-wrapper that allows one to peek at the next items without consuming them.
     """
+    __slots__ = 'iterable', '_peeked',
+
     def __init__(self, iterable):
         self.iterable = iter(iterable)
         self._peeked = deque()

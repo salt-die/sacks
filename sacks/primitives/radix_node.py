@@ -10,6 +10,8 @@ def prefix(body, prefix):
 class RadixNode:
     """Primitive of an Adaptive Radix Tree.
     """
+    __slots__ = 'prefix', 'data', 'children',
+
     def __init__(self, prefix='', data=None):
         self.prefix = prefix
         self.data = data

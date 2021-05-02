@@ -10,7 +10,7 @@ class Dictch(MutableMapping):
     `random` module's `choice`, `choices`, and `sample` functions. This sequence is efficiently
     maintained (though order is not maintained) as the dict is mutated.
     """
-    __slots__ = '_items', '_setch'
+    __slots__ = '_items', '_setch',
 
     def __init__(self, *args, **kwargs):
         self._items = { }
