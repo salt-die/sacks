@@ -14,6 +14,7 @@ An odd collection of odd collections!
 * sequences
     * IndexedSet - An indexable set.
     * Necklace - An immutable sequence that "wraps-around".
+    * RingBuffer - A FIFO buffer with a fixed size.
     * View - A mutable view of a sequence.
 * sets
     * BloomFilter - A data structure with very efficient probabalistic membership checks.  (requires `bitarray`)
