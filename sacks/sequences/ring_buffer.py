@@ -2,7 +2,7 @@ from collections.abc import Iterator, Sized
 
 
 class RingBuffer(Iterator, Sized):
-    """A FIFO buffer with a fixed size.
+    """A FIFO buffer with a fixed size. [https://en.wikipedia.org/wiki/Circular_buffer]
     """
     __slots__ = '_buffer', 'size', '_len', '_head'
 
