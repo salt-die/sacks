@@ -3,7 +3,7 @@ from bitarray import bitarray
 
 
 class BloomFilter(Container):
-    """A data structure with very efficient probabalistic membership checks.
+    """A memory-efficient data structure with probabalistic membership checks.
     """
     __slots__ = '_bitarray', '_nhashes'
 

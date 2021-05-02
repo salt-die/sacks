@@ -17,6 +17,6 @@ An odd collection of odd collections!
     * RingBuffer - A FIFO buffer with a fixed size.
     * View - A mutable view of a sequence.
 * sets
-    * BloomFilter - A data structure with very efficient probabalistic membership checks.  (requires `bitarray`)
+    * BloomFilter - A memory-efficient data structure with probabalistic membership checks.  (requires `bitarray`)
     * OrderedSet - An ordered set.
     * Setch - Set with choice. Exposes a sequence of the items of the set, `as_sequence`, for use with `random` module.
