@@ -20,7 +20,7 @@ class RadixNode:
     def add(self, node):
         """Add `node` to children.  Splits a child if necessary.
         """
-        if self.prefix == node.prefix:
+        if not node.prefix:
             self.data = node.data
             return
 
