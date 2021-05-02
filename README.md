@@ -16,5 +16,6 @@ An odd collection of odd collections!
     * Necklace - An immutable sequence that "wraps-around".
     * View - A mutable view of a sequence.
 * sets
+    * BloomFilter - A data structure with very efficient probabalistic membership checks.  (requires `bitarray`)
     * OrderedSet - An ordered set.
     * Setch - Set with choice. Exposes a sequence of the items of the set, `as_sequence`, for use with `random` module.
