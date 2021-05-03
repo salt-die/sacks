@@ -1,5 +1,6 @@
 from collections.abc import Sequence
 
+
 class Necklace(Sequence):
     """
     An immutable sequence that "wraps-around". [https://en.wikipedia.org/wiki/Necklace_(combinatorics)]
