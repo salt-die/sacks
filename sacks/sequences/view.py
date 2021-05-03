@@ -1,6 +1,30 @@
 from collections.abc import MutableSequence
+from functools import wraps
 
 
+class InvalidatedView(Exception):
+    ...
+
+
+def raise_if_invalidated(cls):
+    """Adds a validation check to all methods of `View`.
+    """
+    def check(func):
+        @wraps(func)
+        def wrapper(self, *args, **kwargs):
+            if len(self.sequence) != self._olen:
+                raise InvalidatedView("sequence length changed")
+            return func(self, *args, **kwargs)
+        return wrapper
+
+    for key, method in cls.__dict__.items():
+        if key != '__init__' and callable(method):
+            setattr(cls, key, check(method))
+
+    return cls
+
+
+@raise_if_invalidated
 class View(MutableSequence):
     """
     A mutable view of a sequence.
@@ -8,12 +32,17 @@ class View(MutableSequence):
     Warning
     -------
     Passing in a `_range` is not recommended.  Better to slice a default `View` instead.
+
+    Raises
+    ------
+    `InvalidatedView` if the underlying sequence's length changes.
     """
-    __slots__ = 'sequence', '_range',
+    __slots__ = 'sequence', '_olen', '_range',
 
     def __init__(self, sequence, _range=None):
         self.sequence = sequence
-        self._range = _range or range(len(sequence))
+        self._olen = len(sequence)  # original length
+        self._range = _range or range(self._olen)
 
     def insert(self, index, item):
         """Insert item before index.
