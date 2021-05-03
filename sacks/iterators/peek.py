@@ -1,5 +1,6 @@
-from collections import deque
 from collections.abc import Iterator
+
+from ..iterables import DoublyLinkedList
 
 RAISE = object()
 
@@ -11,7 +12,7 @@ class Peek(Iterator):
 
     def __init__(self, iterable):
         self.iterable = iter(iterable)
-        self._peeked = deque()
+        self._peeked = DoublyLinkedList()
 
     def __next__(self):
         if self._peeked:
@@ -54,10 +55,9 @@ class Peek(Iterator):
 
             return *peeked, *(default for _ in range(n - len(peeked)))
 
-        if n == 1:
-            return peeked[0]
-
         it = iter(peeked)
+        if n == 1:
+            return next(it)
         return tuple(next(it) for _ in range(n))
 
     def __repr__(self):
