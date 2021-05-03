@@ -33,7 +33,7 @@ class RadixNode:
 
         children = self.children
 
-        i = bisect(children , node)
+        i = bisect(children, node)
         if i < len(children) and (m := children[i].matchlen(node)):
             child = children[i]
         elif 0 < i and (m := children[i - 1].matchlen(node)):
