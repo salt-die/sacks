@@ -9,6 +9,8 @@ def prefix(body, prefix):
 NOT_A_KEY = type('NOT_A_KEY', (), {'__repr__': lambda self: 'NOT_A_KEY'})()  # Sentinel / Indicates a node is not a key of the tree, but just a passing node.
 
 
+# TODO: optimize bisect conditionals using only first item of prefix
+
 class RadixNode:
     """Primitive of an Adaptive Radix Tree.
     """
