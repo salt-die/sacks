@@ -35,6 +35,8 @@ class RadixNode:
             yield from (self.prefix + key for key in child.iter_keys())
 
     def find(self, node):
+        """If node is a descendent return its data, else raise a KeyError.
+        """
         if not node.prefix:
             if self.is_key:
                 return self.data
@@ -99,10 +101,12 @@ class RadixNode:
                 self.data = NOT_A_KEY
                 return
             raise KeyError(node.prefix)
+
         # This is organized slightly differently than `is_descendent` and `add` methods
         # as nodes have to be deleted "from the top", i.e., by their parents.
         # This because a node has no reference to its parent and can't remove itself from the parent's
         # children.
+
         children = self.children
 
         i = bisect(children, node)
