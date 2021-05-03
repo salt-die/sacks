@@ -61,9 +61,9 @@ class RadixNode:
         """Add `node` to children.  Splits a child if necessary.  To track tree size we return True if the node is a new key.
         """
         if not node.prefix:
-            new_key = not self.is_key
+            is_new_key = not self.is_key
             self.data = node.data
-            return new_key
+            return is_new_key
 
         children = self.children
 
