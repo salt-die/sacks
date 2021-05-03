@@ -6,13 +6,20 @@ def prefix(body, prefix):
     for line in body:
         yield prefix + line
 
+NO_DATA = object()
+
 
 class RadixNode:
-    """Primitive of an Adaptive Radix Tree.
+    """
+    Primitive of an Adaptive Radix Tree.
+
+    Notes
+    -----
+    `prefix`s should be sequences that are comparable with `<`.  Typical use-case is for strings (as in auto-complete).
     """
     __slots__ = 'prefix', 'data', 'children',
 
-    def __init__(self, prefix='', data=None):
+    def __init__(self, prefix='', data=NO_DATA):
         self.prefix = prefix
         self.data = data
         self.children = [ ]
@@ -48,7 +55,7 @@ class RadixNode:
         new_node = RadixNode(suffix, data=self.data)
         new_node.children = self.children
         self.children = [new_node]
-        self.data = None
+        self.data = NO_DATA
 
     def matchlen(self, other):
         """Number of matching characters at the beginning of self and other's prefixes.
