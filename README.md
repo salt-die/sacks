@@ -7,7 +7,7 @@ An odd collection of odd collections!
 * iterators
     * Peek - An iterator-wrapper that allows one to peek at the next items without consuming them.
 * mappings
-    * AdaptiveRadixTree - *unfinished*
+    * AdaptiveRadixTree - A memory-efficient trie in which each node that is the only child is merged with its parent.
     * Bijection - A one-to-one mapping. `reverse` method allows reverse-lookup.
     * Dictch - Dict with choice. Exposes a sequence of the keys of the mapping, `as_sequence`, for use with `random` module.
 * primitives
