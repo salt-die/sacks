@@ -6,26 +6,60 @@ def prefix(body, prefix):
     for line in body:
         yield prefix + line
 
-NO_DATA = object()
+NOT_A_KEY = type('NOT_A_KEY', (), {'__repr__': lambda self: 'NOT_A_KEY'})()  # Semtinel / Indicates a node is not a key of the tree, but just a passing node.
 
 
 class RadixNode:
-    """
-    Primitive of an Adaptive Radix Tree.
+    """Primitive of an Adaptive Radix Tree.
     """
     __slots__ = 'prefix', 'data', 'children',
 
-    def __init__(self, prefix='', data=NO_DATA):
+    def __init__(self, prefix='', data=NOT_A_KEY):
         self.prefix = prefix
         self.data = data
         self.children = [ ]
 
+    @property
+    def is_key(self):
+        return self.data is not NOT_A_KEY
+
+    def iter_nodes(self):
+        yield self
+        for child in self.children:
+            yield from child.iter_nodes()
+
+    def iter_keys(self):
+        if self.is_key:
+            yield self.prefix
+        for child in self.children:
+            yield from (self.prefix + key for key in child.iter_keys())
+
+    def find(self, node):
+        if not node.prefix:
+            if self.is_key:
+                return self.data
+            raise KeyError(node.prefix)
+
+        children = self.children
+
+        i = bisect(children, node)
+        if i < len(children) and children[i].matchlen(node) == len(children[i].prefix):
+            child = children[i]
+        elif 0 < i and children[i - 1].matchlen(node) == len(children[i - 1].prefix):
+            child = children[i - 1]
+        else:
+            raise KeyError(node.prefix)
+
+        node.prefix = node.prefix[len(child.prefix):]
+        return child.find(node)
+
     def add(self, node):
-        """Add `node` to children.  Splits a child if necessary.
+        """Add `node` to children.  Splits a child if necessary.  To track tree size we return True if the node is a new key.
         """
         if not node.prefix:
+            new_key = not self.is_key
             self.data = node.data
-            return
+            return new_key
 
         children = self.children
 
@@ -35,12 +69,13 @@ class RadixNode:
         elif 0 < i and (m := children[i - 1].matchlen(node)):
             child = children[i - 1]
         else:
-            return children.insert(i, node)
+            children.insert(i, node)
+            return True
 
         node.prefix = node.prefix[m:]
         if m < len(child.prefix):
             child.split(m)
-        child.add(node)
+        return child.add(node)
 
     def split(self, n):
         """
@@ -53,7 +88,58 @@ class RadixNode:
         new_node.children = self.children
 
         self.children = [new_node]
-        self.data = NO_DATA
+        self.data = NOT_A_KEY
+
+    def delete(self, node):
+        """Remove `node` from children.  Re-joins leafs if possible.
+        """
+        # This conditional is only for the root node.
+        if not node.prefix:
+            if self.is_key:
+                self.data = NOT_A_KEY
+                return
+            raise KeyError(node.prefix)
+        # This is organized slightly differently than `is_descendent` and `add` methods
+        # as nodes have to be deleted "from the top", i.e., by their parents.
+        # This because a node has no reference to its parent and can't remove itself from the parent's
+        # children.
+        children = self.children
+
+        i = bisect(children, node)
+        if i < len(children) and children[i].matchlen(node) == len(children[i].prefix):
+            child = children[i]
+        elif 0 < i and children[i - 1].matchlen(node) == len(children[i - 1].prefix):
+            i -= 1
+            child = children[i]
+        else:
+            raise KeyError(node.prefix)
+
+        if len(node.prefix) == len(child.prefix):
+            if not child.is_key:
+                raise KeyError(node.prefix)
+
+            if child.children:
+                child.data = NOT_A_KEY
+                child.join()
+            else:
+                self.children.pop(i)
+                self.join()
+        else:
+            node.prefix = node.prefix[len(child.prefix):]
+            child.delete(node)
+
+    def join(self):
+        """
+        If this node contains no data and only has a single child node,
+        adopt the child node's children and data.
+        """
+        if len(self.children) != 1 or self.is_key:
+            return
+
+        child ,= self.children
+        self.prefix += child.prefix
+        self.data = child.data
+        self.children = child.children
 
     def matchlen(self, other):
         """Number of matching characters at the beginning of self and other's prefixes.
@@ -77,7 +163,7 @@ class RadixNode:
     def __str__(self):
         """Tree structure of nodes as a string.
         """
-        lines = [self.prefix or 'root']
+        lines = [repr(self.prefix)]
         if self.children:
             *children, last = self.children
 
