@@ -12,10 +12,6 @@ NO_DATA = object()
 class RadixNode:
     """
     Primitive of an Adaptive Radix Tree.
-
-    Notes
-    -----
-    `prefix`s should be sequences that are comparable with `<`.  Typical use-case is for strings (as in auto-complete).
     """
     __slots__ = 'prefix', 'data', 'children',
 
