@@ -52,8 +52,10 @@ class RadixNode:
         that adopts this node's children.
         """
         self.prefix, suffix = self.prefix[:n], self.prefix[n:]
+
         new_node = RadixNode(suffix, data=self.data)
         new_node.children = self.children
+
         self.children = [new_node]
         self.data = NO_DATA
 
