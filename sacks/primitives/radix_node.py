@@ -6,7 +6,7 @@ def prefix(body, prefix):
     for line in body:
         yield prefix + line
 
-NOT_A_KEY = type('NOT_A_KEY', (), {'__repr__': lambda self: 'NOT_A_KEY'})()  # Semtinel / Indicates a node is not a key of the tree, but just a passing node.
+NOT_A_KEY = type('NOT_A_KEY', (), {'__repr__': lambda self: 'NOT_A_KEY'})()  # Sentinel / Indicates a node is not a key of the tree, but just a passing node.
 
 
 class RadixNode:
