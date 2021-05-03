@@ -10,7 +10,7 @@ class AdaptiveRadixTree(MutableMapping):
 
     Parameters
     ----------
-    type : sequence-type comparable with `<` (keyword-only, default: str)
+    type : sequence-type comparable with `<` and joinable with `+`. (keyword-only, default: str)
 
     """
     __slots__ = 'root', '_len',
