@@ -13,10 +13,11 @@ class AdaptiveRadixTree(MutableMapping):
     type : sliceable sequence-type comparable with `<` and joinable with `+`. (keyword-only, default: str)
 
     """
-    __slots__ = '_root', '_len',
+    __slots__ = '_root', '_type', '_len',
 
     def __init__(self, *items, type=str, **kwargs):
         self._root = RadixNode(type())
+        self._type = type
         self._len = 0
 
         for key, value in items:
@@ -30,8 +31,8 @@ class AdaptiveRadixTree(MutableMapping):
             raise KeyError(item) from e
 
     def __setitem__(self, item, value):
-        if not isinstance(item, type(self._root.prefix)):
-            raise TypeError(f'{type(item).__name__} is not {type(self._root.prefix).__name__}')
+        if not isinstance(item, self._type):
+            raise TypeError(f'{type(item).__name__} is not {self._type.__name__}')
         self._len += self._root.add(RadixNode(item, data=value))
 
     def __delitem__(self, item):
@@ -64,8 +65,7 @@ class AdaptiveRadixTree(MutableMapping):
 
     def __repr__(self):
         items = ', '.join(f'{key!r}: {self[key]!r}' for key in self)
-        type_ = type(self._root.prefix).__name__
-        return f'{type(self).__name__}(type={type_}, {{{items}}})'
+        return f'{type(self).__name__}(type={self._type.__name__}, {{{items}}})'
 
     def __str__(self):
         return str(self._root)
