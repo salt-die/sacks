@@ -58,7 +58,12 @@ class RadixNode:
         return child.find(node)
 
     def add(self, node):
-        """Add `node` to children.  Splits a child if necessary.  To track tree size we return True if the node is a new key.
+        """
+        Add `node` to children.  Splits a child if necessary.
+
+        Notes
+        -----
+        To track tree size we return True if the node is a new key.
         """
         if not node.prefix:
             is_new_key = not self.is_key
@@ -83,8 +88,8 @@ class RadixNode:
 
     def split(self, n):
         """
-        Split this node's prefix at index `n`.  Creating a new child node with the suffix
-        that adopts this node's children.
+        Split this node's prefix at index `n` and create a new child node
+        with the suffix that adopts this node's children.
         """
         self.prefix, suffix = self.prefix[:n], self.prefix[n:]
 
@@ -95,7 +100,7 @@ class RadixNode:
         self.data = NOT_A_KEY
 
     def delete(self, node):
-        """Remove `node` from children.  Re-joins leafs if possible.
+        """Remove `node` from children.  Re-joins leafs if possible.  Raises KeyError if node isn't a descendent.
         """
         # This conditional is only for the root node.
         if not node.prefix:
@@ -104,7 +109,7 @@ class RadixNode:
                 return
             raise KeyError(node.prefix)
 
-        # This is organized slightly differently than `is_descendent` and `add` methods
+        # This is organized slightly differently than `find` and `add` methods
         # as nodes have to be deleted "from the top", i.e., by their parents.
         # This because a node has no reference to its parent and can't remove itself from the parent's
         # children.
