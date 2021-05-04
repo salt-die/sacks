@@ -30,9 +30,21 @@ class AdaptiveRadixTree(MutableMapping):
             raise KeyError(item) from e
 
     def __setitem__(self, item, value):
+        if not isinstance(item, type(self._root.prefix)):
+            raise TypeError(f'{type(item).__name__} is not {type(self._root.prefix).__name__}')
         self._len += self._root.add(RadixNode(item, data=value))
 
     def __delitem__(self, item):
+        if item == self._root.prefix:
+            # Special case for the root (node deletions are expected
+            # to be from parents of the node, but the root has no parents).
+            # Note the root won't be removed, but its data may be erased.
+            if self._root.is_key:
+                self.root.data = RadixNode.NOT_KEY
+                self._len -= 1
+                return
+            raise KeyError(item)
+
         try:
             self._root.delete(RadixNode(item))
         except KeyError as e:
