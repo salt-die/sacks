@@ -64,7 +64,8 @@ class AdaptiveRadixTree(MutableMapping):
 
     def __repr__(self):
         items = ', '.join(f'{key!r}: {self[key]!r}' for key in self)
-        return f'{type(self).__name__}({{{items}}})'
+        type_ = type(self._root.prefix).__name__
+        return f'{type(self).__name__}(type={type_}, {{{items}}})'
 
     def __str__(self):
         return str(self._root)
