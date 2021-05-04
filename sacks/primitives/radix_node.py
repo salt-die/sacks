@@ -7,7 +7,7 @@ def prefix(body, prefix):
         yield prefix + line
 
 # Sentinel / Indicates a node is not a key of the tree, but just a passing node.
-NOT_A_KEY = type('NOT_A_KEY', (), {'__repr__': lambda self: 'NOT_A_KEY'})()
+NOT_KEY = type('NOT_KEY', (), {'__repr__': lambda self: 'NOT_KEY'})()
 
 
 class RadixNode:
@@ -15,14 +15,16 @@ class RadixNode:
     """
     __slots__ = 'prefix', 'data', 'children',
 
-    def __init__(self, prefix='', data=NOT_A_KEY):
+    NOT_KEY = NOT_KEY
+
+    def __init__(self, prefix='', data=NOT_KEY):
         self.prefix = prefix
         self.data = data
         self.children = [ ]
 
     @property
     def is_key(self):
-        return self.data is not NOT_A_KEY
+        return self.data is not NOT_KEY
 
     def iter_nodes(self):
         yield self
@@ -90,18 +92,11 @@ class RadixNode:
         new_node.children = self.children
 
         self.children = [new_node]
-        self.data = NOT_A_KEY
+        self.data = NOT_KEY
 
     def delete(self, node):
         """Remove `node` from children.  Re-joins leafs if possible.  Raises KeyError if node isn't a descendent.
         """
-        # This conditional is only for the root node.
-        if not node.prefix:
-            if self.is_key:
-                self.data = NOT_A_KEY
-                return
-            raise KeyError(node.prefix)
-
         # This is organized slightly differently than `find` and `add` methods
         # as nodes have to be deleted "from the top", i.e., by their parents.
         # This because a node has no reference to its parent and can't remove itself from the parent's
@@ -119,7 +114,7 @@ class RadixNode:
                 raise KeyError(node.prefix)
 
             if child.children:
-                child.data = NOT_A_KEY
+                child.data = NOT_KEY
                 child.join()
             else:
                 self.children.pop(i)
@@ -129,9 +124,7 @@ class RadixNode:
             child.delete(node)
 
     def join(self):
-        """
-        If this node contains no data and only has a single child node,
-        adopt the child node's children and data.
+        """Merge child (if only one) and if this node isn't a key.
         """
         if len(self.children) != 1 or self.is_key:
             return
@@ -142,7 +135,7 @@ class RadixNode:
         self.children = child.children
 
     def matchlen(self, other):
-        """Number of matching characters at the beginning of self and other's prefixes.
+        """Number of matching items at the beginning of self and other's prefixes.
         """
         matched = 0
         for k, p in zip(other.prefix, self.prefix):
@@ -153,9 +146,9 @@ class RadixNode:
         return matched
 
     def __lt__(self, other):
-        """Nodes ordered by first item of prefix.  This is enough as prefixes can't overlap at any depth.
+        """Nodes ordered by first item of prefix.  This is enough as prefixes can't overlap at any given depth.
         """
-        return self.prefix[0] < other.prefix[0]
+        return self.prefix[:1] < other.prefix[:1]
 
     def __repr__(self):
         return f"{type(self).__name__}(prefix='{self.prefix}', data={self.data!r})"
