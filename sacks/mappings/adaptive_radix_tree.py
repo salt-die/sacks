@@ -21,7 +21,7 @@ class AdaptiveRadixTree(MutableMapping):
 
         for key, value in items:
             self[key] = value
-        self.update(kwargs)
+        self |= kwargs
 
     def __getitem__(self, item):
         try:
@@ -39,6 +39,10 @@ class AdaptiveRadixTree(MutableMapping):
             raise KeyError(item) from e
         else:
             self._len -= 1
+
+    def __ior__(self, other):
+        self.update(other)
+        return self
 
     def __iter__(self):
         yield from self.root.iter_keys()
