@@ -1,4 +1,4 @@
-from bisect import bisect
+from bisect import bisect_left
 
 def prefix(body, prefix):
     """Yields each line of `body` prefixed with `prefix`. Helper for `RadixNode`'s `__str__` method.
@@ -6,10 +6,9 @@ def prefix(body, prefix):
     for line in body:
         yield prefix + line
 
-NOT_A_KEY = type('NOT_A_KEY', (), {'__repr__': lambda self: 'NOT_A_KEY'})()  # Sentinel / Indicates a node is not a key of the tree, but just a passing node.
+# Sentinel / Indicates a node is not a key of the tree, but just a passing node.
+NOT_A_KEY = type('NOT_A_KEY', (), {'__repr__': lambda self: 'NOT_A_KEY'})()
 
-
-# TODO: optimize bisect conditionals using only first item of prefix
 
 class RadixNode:
     """Primitive of an Adaptive Radix Tree.
@@ -46,14 +45,11 @@ class RadixNode:
 
         children = self.children
 
-        i = bisect(children, node)
-        if i < len(children) and children[i].matchlen(node) == len(children[i].prefix):
-            child = children[i]
-        elif 0 < i and children[i - 1].matchlen(node) == len(children[i - 1].prefix):
-            child = children[i - 1]
-        else:
+        i = bisect_left(children, node)
+        if i == len(children) or children[i].matchlen(node) != len(children[i].prefix):
             raise KeyError(node.prefix)
 
+        child = children[i]
         node.prefix = node.prefix[len(child.prefix):]
         return child.find(node)
 
@@ -72,15 +68,12 @@ class RadixNode:
 
         children = self.children
 
-        i = bisect(children, node)
-        if i < len(children) and (m := children[i].matchlen(node)):
-            child = children[i]
-        elif 0 < i and (m := children[i - 1].matchlen(node)):
-            child = children[i - 1]
-        else:
+        i = bisect_left(children, node)
+        if i == len(children) or not (m := children[i].matchlen(node)):
             children.insert(i, node)
             return True
 
+        child = children[i]
         node.prefix = node.prefix[m:]
         if m < len(child.prefix):
             child.split(m)
@@ -116,15 +109,11 @@ class RadixNode:
 
         children = self.children
 
-        i = bisect(children, node)
-        if i < len(children) and children[i].matchlen(node) == len(children[i].prefix):
-            child = children[i]
-        elif 0 < i and children[i - 1].matchlen(node) == len(children[i - 1].prefix):
-            i -= 1
-            child = children[i]
-        else:
+        i = bisect_left(children, node)
+        if i == len(children) or children[i].matchlen(node) != len(children[i].prefix):
             raise KeyError(node.prefix)
 
+        child = children[i]
         if len(node.prefix) == len(child.prefix):
             if not child.is_key:
                 raise KeyError(node.prefix)
@@ -164,9 +153,9 @@ class RadixNode:
         return matched
 
     def __lt__(self, other):
-        """Nodes ordered by prefix.
+        """Nodes ordered by first item of prefix.  This is enough as prefixes can't overlap at any depth.
         """
-        return self.prefix < other.prefix
+        return self.prefix[0] < other.prefix[0]
 
     def __repr__(self):
         return f"{type(self).__name__}(prefix='{self.prefix}', data={self.data!r})"
