@@ -1,10 +1,5 @@
 from bisect import bisect_left
-
-def prefix(body, prefix):
-    """Yields each line of `body` prefixed with `prefix`. Helper for `RadixNode`'s `__str__` method.
-    """
-    for line in body:
-        yield prefix + line
+from ._prefix import prefix
 
 # Sentinel / Indicates a node is not a key of the tree, but just a passing node.
 NOT_KEY = type('NOT_KEY', (), {'__repr__': lambda self: 'NOT_KEY'})()
