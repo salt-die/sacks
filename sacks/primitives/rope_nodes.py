@@ -56,7 +56,7 @@ class RopeNode:
 
 
 class RopeInternal(RopeNode):
-    """Internal node of a Rope
+    """Internal node of a Rope.
     """
 
     __slots__ = '_left', '_right',
@@ -98,7 +98,7 @@ class RopeInternal(RopeNode):
 
     @property
     def height(self):
-        return max(self.left.height, self.right.height) + 1
+        return max(self.left.height if self.left else 0, self.right.height if self.right else 0) + 1
 
     def __repr__(self):
         return f'{type(self).__name__}(left={self.left!r}, right={self.right!r})'
