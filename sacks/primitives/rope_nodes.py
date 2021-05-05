@@ -29,21 +29,19 @@ class RopeNode:
 
     @parent.setter
     def parent(self, node):
-        if self._parent is not None and node is not None:
-            # If given a new parent, remove old parent's reference.
-            # TODO: If we don't take of advantage of this particular behavior in
-            # our Rope implmentation, delete this conditional.
+        if self._parent is not None:
+            # Remove this node from its parent.
             if self._parent._left is self:
                 self._parent._left = None
             elif self._parent._right is self:
                 self._parent._right = None
 
-        if self._parent is not None:
             self._parent.weight -= self.weight
 
-        self._parent = node
         if node is not None:
-            self._parent.weight += self.weight
+            node.weight += self.weight
+
+        self._parent = node
 
     @property
     def weight(self):
@@ -53,6 +51,7 @@ class RopeNode:
     def weight(self, value):
         if self._parent is not None:
             self._parent.weight += value - self._weight
+
         self._weight = value
 
 
@@ -65,6 +64,7 @@ class RopeInternal(RopeNode):
     def __init__(self, left=None, right=None):
         super().__init__()
         self._left = self._right = None
+
         self.left = left
         self.right = right
 
@@ -77,9 +77,10 @@ class RopeInternal(RopeNode):
         if self._left is not None:
             self._left.parent = None
 
-        self._left = node
         if node is not None:
             node.parent = self
+
+        self._left = node
 
     @property
     def right(self):
@@ -90,9 +91,10 @@ class RopeInternal(RopeNode):
         if self._right is not None:
             self._right.parent = None
 
-        self._right = node
         if node is not None:
             node.parent = self
+
+        self._right = node
 
     @property
     def height(self):
@@ -104,7 +106,7 @@ class RopeInternal(RopeNode):
     def __str__(self):
         """Tree structure of nodes as a string.
         """
-        lines = [str(self.weight)]
+        lines = [ str(self.weight) ]
 
         if self.left and self.right:
             first, second = self.left, self.right
