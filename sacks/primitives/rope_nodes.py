@@ -1,29 +1,26 @@
 #######################################################################################
-# Setting up some machinery to simplify our Rope data structure:                      #
-#     * We use a dummy node, `EMPTY`, so we don't have to check nodes for existence.  #
+# We've set up some machinery to simplify our Rope data structure:                    #
 #     * When left or right child of a RopeInternal node is set, the node will set     #
-#       itself as parent to that child.                                               #
-#     * When a RopeNode's parent is set it will add its weight to its parent's weight #
-#       (subtracting its weight from its old parent).                                 #
-#     * When a RopeNode's weight is changed it will dispatch that change to its       #
+#       itself as parent to that child. ↴                                             #
+#     ↳ When a RopeNode's parent is set it will add its weight to its parent's weight #
+#       (subtracting its weight from its old parent). ↴                               #
+#     ↳ When a RopeNode's weight is changed it will dispatch that change to its       #
 #       parent.                                                                       #
 #######################################################################################
-
-EMPTY = type('EMPTY', (), {
-    '__repr__': lambda self: 'EMPTY',
-    'parent': property(lambda self: None, lambda self, val: None),  # Setting EMPTY's parent does nothing...
-    'weight': property(lambda self: 0, lambda self, val: None),     # ...neither does setting its weight.
-    'height': 0,                                                    # Just a weightless orphan.  Short too.
-})()
+from ._prefix import prefix
 
 
 class RopeNode:
-    """Base Node
     """
+    The base primitive of a Rope.
+
+    A Rope is a tree-like structure that allows efficient manipulation of variable-length types.
+    """
+
     __slots__ = '_parent', '_weight',
 
     def __init__(self):
-        self._parent = EMPTY
+        self._parent = None
         self._weight = 0
 
     @property
@@ -32,10 +29,21 @@ class RopeNode:
 
     @parent.setter
     def parent(self, node):
-        # Subtract weight from old parent and add it to new parent
-        self._parent.weight -= self.weight
+        if self._parent is not None and node is not None:
+            # If given a new parent, remove old parent's reference.
+            # TODO: If we don't take of advantage of this particular behavior in
+            # our Rope implmentation, delete this conditional.
+            if self._parent._left is self:
+                self._parent._left = None
+            elif self._parent._right is self:
+                self._parent._right = None
+
+        if self._parent is not None:
+            self._parent.weight -= self.weight
+
         self._parent = node
-        self._parent.weight += self.weight
+        if node is not None:
+            self._parent.weight += self.weight
 
     @property
     def weight(self):
@@ -43,54 +51,85 @@ class RopeNode:
 
     @weight.setter
     def weight(self, value):
-        # Dispatch our weight change to our parent
-        self._parent.weight += value - self.weight
+        if self._parent is not None:
+            self._parent.weight += value - self._weight
         self._weight = value
-
-
-class Child:
-    """Child node property for rope internal nodes.  This will set a child's parent automatically.
-    """
-    __slots__ = 'name'
-
-    def __set_name__(self, owner, name):
-        self.name = '_' + name
-
-    def __set__(self, instance, node):
-        getattr(instance, self.name).parent = EMPTY
-
-        node = node or EMPTY
-        setattr(instance, self.name, node)
-        node.parent = instance
-
-    def __get__(self, instance, owner):
-        if instance is None:
-            return self
-        return getattr(instance, self.name)
 
 
 class RopeInternal(RopeNode):
     """Internal node of a Rope
     """
-    __slots__ = '_left', '_right',
 
-    left = Child()
-    right = Child()
+    __slots__ = '_left', '_right',
 
     def __init__(self, left=None, right=None):
         super().__init__()
-        self._left = self._right = EMPTY
-
+        self._left = self._right = None
         self.left = left
         self.right = right
+
+    @property
+    def left(self):
+        return self._left
+
+    @left.setter
+    def left(self, node):
+        if self._left is not None:
+            self._left.parent = None
+
+        self._left = node
+        if node is not None:
+            node.parent = self
+
+    @property
+    def right(self):
+        return self._right
+
+    @right.setter
+    def right(self, node):
+        if self._right is not None:
+            self._right.parent = None
+
+        self._right = node
+        if node is not None:
+            node.parent = self
 
     @property
     def height(self):
         return max(self.left.height, self.right.height) + 1
 
+    def __repr__(self):
+        return f'{type(self).__name__}(left={self.left!r}, right={self.right!r})'
+
+    def __str__(self):
+        """Tree structure of nodes as a string.
+        """
+        lines = [str(self.weight)]
+
+        if self.left and self.right:
+            first, second = self.left, self.right
+        elif self.left:
+            first, second = None, self.left
+        elif self.right:
+            first, second = None, self.right
+        else:
+            first, second = None, None
+
+        if first:
+            head, *body = str(first).splitlines()
+            lines.append(f'├─{head}')
+            lines.extend(prefix(body,'│ '))
+
+        if second:
+            head, *body = str(second).splitlines()
+            lines.append(f'╰─{head}')
+            lines.extend(prefix(body,'  '))
+
+        return '\n'.join(lines)
+
 
 class RopeLeaf(RopeNode):
-    """Leaf node of a Rope
+    """Leaf node of a Rope.
     """
     __slots__ = '_sequence',
 
@@ -110,3 +149,9 @@ class RopeLeaf(RopeNode):
     @property
     def height(self):
         return 0
+
+    def __repr__(self):
+        return f'{type(self).__name__}(sequence={self.sequence!r})'
+
+    def __str__(self):
+        return f'{self.weight} - {self.sequence!r}'
