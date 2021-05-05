@@ -11,8 +11,9 @@
 
 EMPTY = type('EMPTY', (), {
     '__repr__': lambda self: 'EMPTY',
-    'weight': property(lambda self: 0, lambda self, val: None),  # weight will always be 0
-    'height': 0,
+    'parent': property(lambda self: None, lambda self, val: None),  # Setting EMPTY's parent does nothing...
+    'weight': property(lambda self: 0, lambda self, val: None),     # ...neither does setting its weight.
+    'height': 0,                                                    # Just a weightless orphan.  Short too.
 })()
 
 
@@ -31,6 +32,7 @@ class RopeNode:
 
     @parent.setter
     def parent(self, node):
+        # Subtract weight from old parent and add it to new parent
         self._parent.weight -= self.weight
         self._parent = node
         self._parent.weight += self.weight
@@ -41,12 +43,13 @@ class RopeNode:
 
     @weight.setter
     def weight(self, value):
+        # Dispatch our weight change to our parent
         self._parent.weight += value - self.weight
         self._weight = value
 
 
 class Child:
-    """Child node properties for rope internal nodes.
+    """Child node property for rope internal nodes.  This will set a child's parent automatically.
     """
     __slots__ = 'name'
 
