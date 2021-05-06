@@ -22,7 +22,6 @@ class RopeNode:
 
     A Rope is a tree-like structure that allows efficient manipulation of variable-length types.
     """
-
     __slots__ = '_parent', '_weight',
 
     def __init__(self):
@@ -56,11 +55,34 @@ class RopeNode:
         self._weight = value
 
 
+class Child:
+    """
+    Child node of RopeInternal.
+
+    This property will automatically set internal node as parent to its child.
+    """
+    __slots__ = 'name',
+
+    def __set_name__(self, owner, name):
+        self.name = '_' + name
+
+    def __get__(self, instance, owner):
+        return getattr(instance, self.name)
+
+    def __set__(self, instance, node):
+        getattr(instance, self.name).parent = EMPTY
+        node = node or EMPTY
+        node.parent = instance
+        setattr(instance, self.name, node)
+
+
 class RopeInternal(RopeNode):
     """Internal node of a Rope.
     """
-
     __slots__ = '_left', '_right',
+
+    left = Child()
+    right = Child()
 
     def __init__(self, left=None, right=None):
         super().__init__()
@@ -68,30 +90,6 @@ class RopeInternal(RopeNode):
 
         self.left = left
         self.right = right
-
-    @property
-    def left(self):
-        return self._left
-
-    @left.setter
-    def left(self, node):
-        self._left.parent = EMPTY
-
-        node = node or EMPTY
-        node.parent = self
-        self._left = node
-
-    @property
-    def right(self):
-        return self._right
-
-    @right.setter
-    def right(self, node):
-        self._right.parent = EMPTY
-
-        node = node or EMPTY
-        node.parent = self
-        self._right = node
 
     @property
     def height(self):
