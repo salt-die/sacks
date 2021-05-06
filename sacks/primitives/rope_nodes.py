@@ -6,8 +6,14 @@
 #       (subtracting its weight from its old parent). ↴                               #
 #     ↳ When a RopeNode's weight is changed it will dispatch that change to its       #
 #       parent.                                                                       #
+#                                                                                     #
+# The dummy node, `EMPTY`, lets us avoid conditionals checking nodes for existence.   #
+# Operations on this node are essentially noops.                                      #
 #######################################################################################
+from ._noop import noop
 from ._prefix import prefix
+
+EMPTY = noop('DeadEnd', repr='EMPTY', weight=0, height=0)
 
 
 class RopeNode:
@@ -20,7 +26,7 @@ class RopeNode:
     __slots__ = '_parent', '_weight',
 
     def __init__(self):
-        self._parent = None
+        self._parent = EMPTY
         self._weight = 0
 
     @property
@@ -29,19 +35,16 @@ class RopeNode:
 
     @parent.setter
     def parent(self, node):
-        if self._parent is not None:
-            # Remove this node from its parent.
-            if self._parent._left is self:
-                self._parent._left = None
-            elif self._parent._right is self:
-                self._parent._right = None
+        self._parent.weight -= self.weight
 
-            self._parent.weight -= self.weight
+        # Remove this node from its parent.
+        if self._parent._left is self:
+            self._parent._left = EMPTY
+        elif self._parent._right is self:
+            self._parent._right = EMPTY
 
-        if node is not None:
-            node.weight += self.weight
-
-        self._parent = node
+        node.weight += self.weight
+        self._parent = node or EMPTY
 
     @property
     def weight(self):
@@ -49,9 +52,7 @@ class RopeNode:
 
     @weight.setter
     def weight(self, value):
-        if self._parent is not None:
-            self._parent.weight += value - self._weight
-
+        self._parent.weight += value - self._weight
         self._weight = value
 
 
@@ -63,7 +64,7 @@ class RopeInternal(RopeNode):
 
     def __init__(self, left=None, right=None):
         super().__init__()
-        self._left = self._right = None
+        self._left = self._right = EMPTY
 
         self.left = left
         self.right = right
@@ -74,12 +75,10 @@ class RopeInternal(RopeNode):
 
     @left.setter
     def left(self, node):
-        if self._left is not None:
-            self._left.parent = None
+        self._left.parent = EMPTY
 
-        if node is not None:
-            node.parent = self
-
+        node = node or EMPTY
+        node.parent = self
         self._left = node
 
     @property
@@ -88,17 +87,24 @@ class RopeInternal(RopeNode):
 
     @right.setter
     def right(self, node):
-        if self._right is not None:
-            self._right.parent = None
+        self._right.parent = EMPTY
 
-        if node is not None:
-            node.parent = self
-
+        node = node or EMPTY
+        node.parent = self
         self._right = node
 
     @property
     def height(self):
-        return max(self.left.height if self.left else 0, self.right.height if self.right else 0) + 1
+        return max(self.left.height, self.right.height) + 1
+
+    def iter_nodes(self):
+        yield self
+        yield from self.left.iter_nodes()
+        yield from self.right.iter_nodes()
+
+    def __iter__(self):
+        yield from self.left
+        yield from self.right
 
     def __repr__(self):
         return f'{type(self).__name__}(left={self.left!r}, right={self.right!r})'
@@ -151,6 +157,12 @@ class RopeLeaf(RopeNode):
     @property
     def height(self):
         return 0
+
+    def iter_nodes(self):
+        yield self
+
+    def __iter__(self):
+        yield self.sequence
 
     def __repr__(self):
         return f'{type(self).__name__}(sequence={self.sequence!r})'
