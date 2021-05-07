@@ -8,7 +8,9 @@
 #       parent.                                                                       #
 #                                                                                     #
 # The dummy node, `EMPTY`, lets us avoid conditionals checking nodes for existence.   #
-# Operations on this node are essentially noops.                                      #
+# Operations on this node are essentially noops. This dummy is only used internally;  #
+# Externally, assigning children or parents to None is still fine as setters will     #
+# convert None to EMPTY.                                                              #
 #######################################################################################
 from ._noop import noop
 from ._prefix import prefix
@@ -36,14 +38,14 @@ class RopeNode:
     def parent(self, node):
         self._parent.weight -= self.weight
 
-        # Remove this node from its parent.
+        # Remove this node from its old parent.
         if self._parent._left is self:
             self._parent._left = EMPTY
         elif self._parent._right is self:
             self._parent._right = EMPTY
 
-        node.weight += self.weight
         self._parent = node or EMPTY
+        self._parent.weight += self.weight
 
     @property
     def weight(self):
@@ -70,10 +72,10 @@ class Child:
         return getattr(instance, self.name)
 
     def __set__(self, instance, node):
-        getattr(instance, self.name).parent = EMPTY
-        node = node or EMPTY
-        node.parent = instance
-        setattr(instance, self.name, node)
+        getattr(instance, self.name, EMPTY).parent = EMPTY
+
+        setattr(instance, self.name, node or EMPTY)
+        getattr(instance, self.name).parent = instance
 
 
 class RopeInternal(RopeNode):
@@ -86,7 +88,6 @@ class RopeInternal(RopeNode):
 
     def __init__(self, left=None, right=None):
         super().__init__()
-        self._left = self._right = EMPTY
 
         self.left = left
         self.right = right
@@ -108,7 +109,10 @@ class RopeInternal(RopeNode):
         return f'{type(self).__name__}(left={self.left!r}, right={self.right!r})'
 
     def __str__(self):
-        """Tree structure of nodes as a string.
+        """
+        Tree structure of nodes as a string.
+
+        Note left nodes are printed above right nodes so that one can read the nodes in order from top to bottom.
         """
         lines = [ str(self.weight) ]
 
