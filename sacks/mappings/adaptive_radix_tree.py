@@ -27,8 +27,8 @@ class AdaptiveRadixTree(MutableMapping):
     def __getitem__(self, item):
         try:
             return self._root.find(RadixNode(item))
-        except KeyError as e:
-            raise KeyError(item) from e
+        except KeyError:
+            raise KeyError(item) from None
 
     def __setitem__(self, item, value):
         if not isinstance(item, self._type):
