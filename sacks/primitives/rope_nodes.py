@@ -68,7 +68,7 @@ class RopeNode(ABC):
         pass
 
 
-EMPTY = noop(name='RopeDeadEnd', _repr='EMPTY', abc=RopeNode, methods={ 'copy': lambda self: self }, weight=0, height=0)
+EMPTY = noop(name='RopeDeadEnd', repr='EMPTY', abc=RopeNode, methods={ 'copy': lambda self: self }, attrs={ 'weight': 0, 'height': 0 })
 
 
 class Child:
@@ -100,7 +100,7 @@ class RopeInternal(RopeNode):
     left = Child()
     right = Child()
 
-    def __init__(self, left=None, right=None):
+    def __init__(self, left=EMPTY, right=EMPTY):
         super().__init__()
 
         self.left = left
