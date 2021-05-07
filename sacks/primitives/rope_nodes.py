@@ -7,9 +7,9 @@
 #     ↳ When a RopeNode's weight is changed it will dispatch that change to its       #
 #       parent.                                                                       #
 #                                                                                     #
-# `EMPTY` is a special node for empty nodes. This node is only used internally;       #
-# Externally, assigning children or parents to None is still fine as setters will     #
-# convert None to EMPTY.                                                              #
+# `EMPTY` is a constant for empty nodes. It implements `RopeNode` and so doesn't need #
+# special treatment from `RopeNode` methods (as one might if `None` was used for      #
+# empty nodes).                                                                       #
 #######################################################################################
 from abc import abstractmethod, ABC
 

@@ -38,7 +38,7 @@ def noop(name='', _default=None, _repr='NOOP', abc=None, methods=None, **attrs):
             self.right = right
     ```
 
-    Where we set empty nodes to None. Our Nodes might have a method to iterate through the tree:
+    Where we set empty nodes to `None`. Our nodes might have a method to iterate through the tree:
     ```
         def iter_nodes(self):
             yield self
@@ -57,8 +57,8 @@ def noop(name='', _default=None, _repr='NOOP', abc=None, methods=None, **attrs):
             yield from self.right.iter_nodes()
     ```
 
-    We can eliminate nearly all conditionals in our Node class this way.  (i.e., we've just
-    shortcutted a way to create a DeadEndNode instance that "implements" the Node api.)
+    We can eliminate nearly all conditionals in our Node class this way (i.e., we've just
+    shortcutted a way to create a "dead end node" instance that follows the Node api).
     """
 
     def __init__(self):
@@ -87,11 +87,7 @@ def noop(name='', _default=None, _repr='NOOP', abc=None, methods=None, **attrs):
     }
 
     if abc:
-        METHOD_TEMPLATE = (
-            'def {}{}:\n'
-            f'    return {_default}\n'
-            '    {}\n'
-        )
+        METHOD_TEMPLATE = f'def {{}}{{}}:\n    return {_default}\n    {{}}\n'
         for method_name in abc.__abstractmethods__:
             method = getattr(abc, method_name)
             source = METHOD_TEMPLATE.format(method_name, signature(method), 'yield' if isgeneratorfunction(method) else '')
