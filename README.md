@@ -11,12 +11,14 @@ An odd collection of odd collections!
     * Bijection - A one-to-one mapping. `reverse` method allows reverse-lookup.
     * Dictch - Dict with choice. Exposes a sequence of the keys of the mapping, `as_sequence`, for use with `random` module.
 * primitives
-    * Block - Primitive element of a doubly-linked list.
-    * RadixNode - Primitive element of an Adaptive Radix Tree.
+    * Block - Element of a doubly-linked list.
+    * RadixNode - A node of an Adaptive Radix Tree.
+    * RopeInternal, RopeLeaf - Nodes of a Rope. (*unfinished*)
 * sequences
     * IndexedSet - An indexable set.
     * Necklace - An immutable sequence that "wraps-around".
     * RingBuffer - A FIFO buffer with a fixed size.
+    * Rope - A Rope is a tree-like structure that allows efficient manipulation of variable-length types. (*unfinished*)
     * View - A mutable view of a sequence.
 * sets
     * BloomFilter - A memory-efficient data structure with probabalistic membership checks.  (requires `bitarray`)
