@@ -12,13 +12,13 @@
 # Externally, assigning children or parents to None is still fine as setters will     #
 # convert None to EMPTY.                                                              #
 #######################################################################################
+from abc import abstractmethod, ABC
+
 from ._noop import noop
 from ._prefix import prefix
 
-EMPTY = noop('DeadEnd', repr='EMPTY', weight=0, height=0)
 
-
-class RopeNode:
+class RopeNode(ABC):
     """
     The base primitive of a Rope.
 
@@ -55,6 +55,21 @@ class RopeNode:
     def weight(self, value):
         self._parent.weight += value - self._weight
         self._weight = value
+
+    @abstractmethod
+    def __iter__(self):
+        yield from ()
+
+    @abstractmethod
+    def iter_nodes(self):
+        yield from ()
+
+    @abstractmethod
+    def copy(self):
+        pass
+
+
+EMPTY = noop(name='RopeDeadEnd', _repr='EMPTY', abc=RopeNode, methods={ 'copy': lambda self: self }, weight=0, height=0)
 
 
 class Child:
@@ -119,24 +134,13 @@ class RopeInternal(RopeNode):
         """
         lines = [ str(self.weight) ]
 
-        if self.left and self.right:
-            first, second = self.left, self.right
-        elif self.left:
-            first, second = None, self.left
-        elif self.right:
-            first, second = None, self.right
-        else:
-            first, second = None, None
+        head, *body = str(self.left).splitlines()
+        lines.append(f'├─{head}')
+        lines.extend(prefix(body,'│ '))
 
-        if first:
-            head, *body = str(first).splitlines()
-            lines.append(f'├─{head}')
-            lines.extend(prefix(body,'│ '))
-
-        if second:
-            head, *body = str(second).splitlines()
-            lines.append(f'╰─{head}')
-            lines.extend(prefix(body,'  '))
+        head, *body = str(self.right).splitlines()
+        lines.append(f'╰─{head}')
+        lines.extend(prefix(body,'  '))
 
         return '\n'.join(lines)
 
