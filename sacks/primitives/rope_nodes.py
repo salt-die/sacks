@@ -7,8 +7,7 @@
 #     ↳ When a RopeNode's weight is changed it will dispatch that change to its       #
 #       parent.                                                                       #
 #                                                                                     #
-# The dummy node, `EMPTY`, lets us avoid conditionals checking nodes for existence.   #
-# Operations on this node are essentially noops. This dummy is only used internally;  #
+# `EMPTY` is a special node for empty nodes. This node is only used internally;       #
 # Externally, assigning children or parents to None is still fine as setters will     #
 # convert None to EMPTY.                                                              #
 #######################################################################################
