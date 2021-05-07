@@ -22,7 +22,7 @@ class RopeNode:
     """
     The base primitive of a Rope.
 
-    A Rope is a tree-like structure that allows efficient manipulation of variable-length types.
+    A Rope is a binary-tree that allows efficient manipulation of variable-length types.
     """
     __slots__ = '_parent', '_weight',
 

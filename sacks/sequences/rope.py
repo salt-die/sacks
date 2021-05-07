@@ -5,10 +5,18 @@ from ..primitives import RopeInternal, RopeLeaf
 
 class Rope(MutableSequence):
     """
-    A tree-like structure that allows efficient manipulation of variable-length types.
+    A binary-tree that allows efficient manipulation of variable-length types.
 
     Parameters
     ----------
+    sequence (optional):
+        Builds a Rope from the sequence if provided.  `type` is inferred from `sequence`'s type.
+
+    leafsize:
+        Max length of sequences stored in leaf nodes. (default: 8)
+
+    type:
+        Type of sequence stored in leaf nodes.  Inferred from `sequence` if a sequence is provided. (default: str)
     """
     __slots__ = '_root', 'leafsize', 'type',
 

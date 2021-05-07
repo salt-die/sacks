@@ -18,7 +18,7 @@ An odd collection of odd collections!
     * IndexedSet - An indexable set.
     * Necklace - An immutable sequence that "wraps-around".
     * RingBuffer - A FIFO buffer with a fixed size.
-    * Rope - A Rope is a tree-like structure that allows efficient manipulation of variable-length types. (*unfinished*)
+    * Rope - A binary-tree that allows efficient manipulation of variable-length types. (*unfinished*)
     * View - A mutable view of a sequence.
 * sets
     * BloomFilter - A memory-efficient data structure with probabalistic membership checks.  (requires `bitarray`)
