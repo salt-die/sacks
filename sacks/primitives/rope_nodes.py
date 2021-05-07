@@ -105,6 +105,9 @@ class RopeInternal(RopeNode):
         yield from self.left
         yield from self.right
 
+    def copy(self):
+        return type(self)(self.left.copy(), self.right.copy())
+
     def __repr__(self):
         return f'{type(self).__name__}(left={self.left!r}, right={self.right!r})'
 
@@ -165,6 +168,9 @@ class RopeLeaf(RopeNode):
 
     def __iter__(self):
         yield self.sequence
+
+    def copy(self):
+        return type(self)(self.sequence)
 
     def __repr__(self):
         return f'{type(self).__name__}(sequence={self.sequence!r})'

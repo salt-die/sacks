@@ -2,13 +2,15 @@
 def noop(name='', default=None, repr='NOOP', **kwargs):
     """
     Build and return an instance of a "noop" class. Modifying attributes of
-    this class does nothing and `__getattr__`  returns `default`.
+    this class does nothing and `__getattr__`  returns `default`. Use
+    `kwargs` to set default values for specific attribtues.
 
     What's the point?  In tree-like structures, some nodes may have some
     children set to `None`. In this case, node methods will always have to
     check if a child is None beforehand. Alternatively, one can just set a
-    node to an instance of this class.  Now methods that attempt to mutate the
-    child just do nothing.
+    node to an instance of this class:  Now methods that attempt to mutate
+    the node just do nothing and methods that access its attributes get
+    default values provided in `kwargs` or `default`.
     """
     kwargs |= { 'default': default, 'repr': repr }
 
@@ -26,6 +28,9 @@ def noop(name='', default=None, repr='NOOP', **kwargs):
         return
         yield
 
+    def copy(self):
+        return self
+
     def __bool__(self):
         return False
 
@@ -39,6 +44,7 @@ def noop(name='', default=None, repr='NOOP', **kwargs):
         '__getattr__': __getattr__,
         '__iter__': __iter__,
         'iter_nodes': __iter__,
+        'copy': copy,
         '__bool__': __bool__,
         '__repr__': __repr__,
     }
