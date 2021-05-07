@@ -151,7 +151,7 @@ class RadixNode:
     def __str__(self):
         """Tree structure of nodes as a string.
         """
-        lines = [repr(self.prefix)]
+        lines = [ repr(self.prefix) ]
         if self.children:
             *children, last = self.children
 
