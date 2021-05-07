@@ -42,23 +42,36 @@ def noop(name='', _default=None, _repr='NOOP', abc=None, methods=None, **attrs):
     ```
         def iter_nodes(self):
             yield self
-            if self.left:
+            if self.left is not None:
                 yield from self.left.iter_nodes()
-            if self.right:
+            if self.right is not None:
                 yield from self.right.iter_nodes()
     ```
 
-    Alternatively, we could set empty nodes to the object returned by this function (with appropriate
-    arguments) and our method becomes:
+    The issue is that `None` doesn't implement `Node` so we need to special-case it in all our methods.
+    Instead we can create an object that *does* implement Node:
     ```
+    def iter_nodes(self):
+        return
+        yield
+
+    EMPTY = noop(methods={ 'iter_nodes': iter_nodes })
+    ```
+
+    And now our class can be re-written:
+    ```
+    class Node:
+        def __init__(self, left=EMPTY, right=EMPTY):
+            self.left = left
+            self.right = right
+
         def iter_nodes(self):
             yield self
             yield from self.left.iter_nodes()
             yield from self.right.iter_nodes()
     ```
 
-    We can eliminate nearly all conditionals in our Node class this way (i.e., we've just
-    shortcutted a way to create a "dead end node" instance that follows the Node api).
+    A nicer implementation!
     """
 
     def __init__(self):
