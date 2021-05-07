@@ -1,7 +1,7 @@
 from abc import ABCMeta
 from inspect import isgeneratorfunction, signature
 
-def noop(name='', _default=None, _repr='NOOP', abc=None, methods=None, **attrs):
+def noop(name='', default=None, repr='NOOP', abc=None, methods=None, attrs=None):
     """
     Build and return a "noop" object. Modifying attributes of this object
     does nothing (are noops!). Methods in `abc` not provided in `methods` will
@@ -12,10 +12,10 @@ def noop(name='', _default=None, _repr='NOOP', abc=None, methods=None, **attrs):
     name: str
         The type name. (default: '')
 
-    _default: Any
+    default: Any
         Return value for abstract methods and value for missing `attrs`. (default: None)
 
-    _repr: str
+    repr: str
         `__repr__` string.  (default: 'NOOP')
 
     abc (optional): ABCMeta
@@ -24,7 +24,7 @@ def noop(name='', _default=None, _repr='NOOP', abc=None, methods=None, **attrs):
     methods (optional): dict
         Additional methods for this object.
 
-    **attrs (optional):
+    attrs (optional): dict
         Additional default values for this object.
 
     Notes
@@ -73,34 +73,24 @@ def noop(name='', _default=None, _repr='NOOP', abc=None, methods=None, **attrs):
 
     A nicer implementation!
     """
+    attrs = attrs or { }
+    methods = methods or { }
 
     def __init__(self):
         for attr, val in attrs.items():
             object.__setattr__(self, attr, val)
 
-    def __setattr__(self, name, value):
-        pass
-
-    def __getattr__(self, name):
-        return _default
-
-    def __bool__(self):
-        return False
-
-    def __repr__(self):
-        return _repr
-
     namespace = {
         '__slots__': tuple(attrs),
         '__init__': __init__,
-        '__setattr__': __setattr__,
-        '__getattr__': __getattr__,
-        '__bool__': __bool__,
-        '__repr__': __repr__,
+        '__setattr__': lambda self, attr, value: None,
+        '__getattr__': lambda self, attr: default,
+        '__bool__': lambda self: False,
+        '__repr__': lambda self: repr,
     }
 
     if abc:
-        METHOD_TEMPLATE = f'def {{}}{{}}:\n    return {_default}\n    {{}}\n'
+        METHOD_TEMPLATE = f'def {{}}{{}}:\n    return {default}\n    {{}}\n'
         for method_name in abc.__abstractmethods__:
             method = getattr(abc, method_name)
             source = METHOD_TEMPLATE.format(method_name, signature(method), 'yield' if isgeneratorfunction(method) else '')
