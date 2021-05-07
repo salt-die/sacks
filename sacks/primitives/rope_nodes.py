@@ -14,7 +14,7 @@
 from abc import abstractmethod, ABC
 
 from ._noop import noop
-from ._prefix import prefix
+from ._tree_printer import tree_printer
 
 
 class RopeNode(ABC):
@@ -131,17 +131,7 @@ class RopeInternal(RopeNode):
 
         Note left nodes are printed above right nodes so that one can read the nodes in order from top to bottom.
         """
-        lines = [ str(self.weight) ]
-
-        head, *body = str(self.left).splitlines()
-        lines.append(f'├─{head}')
-        lines.extend(prefix(body,'│ '))
-
-        head, *body = str(self.right).splitlines()
-        lines.append(f'╰─{head}')
-        lines.extend(prefix(body,'  '))
-
-        return '\n'.join(lines)
+        return '\n'.join(tree_printer(str(self.weight), (self.left, self.right)))
 
 
 class RopeLeaf(RopeNode):

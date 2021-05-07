@@ -1,5 +1,5 @@
 from bisect import bisect_left
-from ._prefix import prefix
+from ._tree_printer import tree_printer
 
 # Sentinel / Indicates a node is not a key of the tree, but just a passing node.
 NOT_KEY = type('NOT_KEY', (), {'__repr__': lambda self: 'NOT_KEY'})()
@@ -151,17 +151,4 @@ class RadixNode:
     def __str__(self):
         """Tree structure of nodes as a string.
         """
-        lines = [ repr(self.prefix) ]
-        if self.children:
-            *children, last = self.children
-
-            for child in children:
-                first, *rest = str(child).splitlines()
-                lines.append(f'├─{first}')
-                lines.extend(prefix(rest,'│ '))
-
-            first, *rest = str(last).splitlines()
-            lines.append(f'╰─{first}')
-            lines.extend(prefix(rest,'  '))
-
-        return '\n'.join(lines)
+        return '\n'.join(tree_printer(repr(self.prefix), self.children))
