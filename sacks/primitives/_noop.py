@@ -57,7 +57,7 @@ def noop(name='', _default=None, _repr='NOOP', abc=None, methods=None, **attrs):
             yield from self.right.iter_nodes()
     ```
 
-    We can eliminate nearly all conditionals in our Node class this way.  (e.g., we've just
+    We can eliminate nearly all conditionals in our Node class this way.  (i.e., we've just
     shortcutted a way to create a DeadEndNode instance that "implements" the Node api.)
     """
 
