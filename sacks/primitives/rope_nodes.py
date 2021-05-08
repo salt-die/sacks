@@ -111,6 +111,32 @@ class RopeInternal(RopeNode):
         self.right = right
 
     @property
+    def balance_factor(self):
+        return self.left.height - self.right.height  # TODO: Keep this updated, so we don't have to recalulate?
+
+    def collapse(self):
+        """Trim all empty leaves from the tree.
+        """
+        if isinstance(self.left, RopeInternal):
+            self.left.collapse()
+
+        if isinstance(self.right, RopeInternal):
+            self.right.collapse()
+
+        if self.parent is not EMPTY:  # Special case for root.
+            if self.left is EMPTY:
+                only_child = self.right
+            elif self.right is EMPTY:
+                only_child = self.left
+            else:
+                return
+
+            if self.parent.left is self:
+                self.parent.left = only_child
+            else:
+                self.parent.right = only_child
+
+    @property
     def height(self):
         return max(self.left.height, self.right.height) + 1
 
