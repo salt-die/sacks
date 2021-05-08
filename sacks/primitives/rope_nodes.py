@@ -61,7 +61,9 @@ class RopeNode(ABC):
 
     @abstractmethod
     def query(self, i):
-        """Return the node that contains index `i` and the index of that node's sequence that corresponds to `i`.
+        """
+        Return the node that contains index `i` and the index of that node's sequence
+        that corresponds to `i`.
         """
         pass
 
@@ -119,7 +121,7 @@ class RopeInternal(RopeNode):
 
     @property
     def balance_factor(self):
-        return self.left.height - self.right.height  # TODO: Keep this updated, so we don't have to recalulate?
+        return self.left.height - self.right.height  # TODO: Keep this updated as tree is mutated
 
     def collapse(self):
         """Trim all empty leaves from the tree.
@@ -174,7 +176,10 @@ class RopeInternal(RopeNode):
         """
         Tree structure of nodes as a string.
 
-        Note left nodes are printed above right nodes so that one can read the nodes in order from top to bottom.
+        Notes
+        -----
+        Left nodes are printed above right nodes so that one can read the nodes in
+        order from top to bottom.
         """
         return '\n'.join(tree_printer(str(self.weight), (self.left, self.right)))
 
