@@ -1,4 +1,5 @@
 from collections.abc import MutableSequence
+from functools import wraps
 
 from ..primitives import RopeInternal, RopeLeaf
 
@@ -10,13 +11,13 @@ class Rope(MutableSequence):
     Parameters
     ----------
     sequence (optional):
-        Builds a Rope from the sequence if provided.  `type` is inferred from `sequence`'s type.
+        Builds a Rope from the sequence if provided. `type` is inferred from `sequence`'s type.
 
     leafsize:
         Max length of sequences stored in leaf nodes. (default: 8)
 
     type:
-        Type of sequence stored in leaf nodes.  Inferred from `sequence` if a sequence is provided. (default: str)
+        Type of sequence stored in leaf nodes. Inferred from `sequence` if a sequence is provided. (default: str)
 
     Notes
     -----
@@ -41,24 +42,31 @@ class Rope(MutableSequence):
         return self._root.weight
 
     def _collapse(self):
-        """Remove all InternalNodes with EMPTY leaves.
+        """Replace all RopeInternal nodes with EMPTY leaves with their non-EMPTY child.
         """
-        raise self._root.collapse()
+        self._root.collapse()
 
-    def _balance(self):
-        root = self._root
+    def balance(self):
+        self._root = self._balance(self._root)
+
+    def _balance(self, root):
+        if not isinstance(root, RopeInternal):
+            return root
+
+        root.left = self._balance(root.left)
+        root.right = self._balance(root.right)
 
         if root.balance_factor > 1:
             if root.left.balance_factor < 0:
                 root.left = self._rotate_left(root.left)  # left-right case
-            self._root = self._rotate_right(root)
-            self._balance()
+            root = self._rotate_right(root)
 
         elif root.balance_factor < -1:
             if root.right.balance_factor > 0:
                 root.right = self._rotate_right(root.right)  # right-left case
-            self._root = self._rotate_left(root)
-            self._balance()
+            root = self._rotate_left(root)
+
+        return root
 
     def _rotate_right(self, root):
         pivot = root.left
@@ -73,7 +81,12 @@ class Rope(MutableSequence):
         return pivot
 
     def __getitem__(self, key):
-        raise NotImplementedError
+        if isinstance(key, int):
+            if key >= len(self):
+                raise IndexError('index out of range')
+
+            node, j = self._root.query(key)
+            return node.sequence[j]
 
     def __setitem__(self, key, value):
         raise NotImplementedError
@@ -88,6 +101,7 @@ class Rope(MutableSequence):
         new_rope = Rope(leafsize=max(self.leafsize, other.leafsize), type=self.type)
         new_rope._root.left = self._root.copy()
         new_rope._root.right = other._root.copy()
+        new_rope.balance()
         return new_rope
 
     def __iadd__(self, other):
@@ -95,12 +109,17 @@ class Rope(MutableSequence):
             raise TypeError(f'Incompatible types: {self.type}, {other.type}')
 
         self._root = RopeInternal(self._root, other._root.copy())
+        self.balance()
 
     def join(self, other):
         self._root = RopeInternal(self._root, other._root)
+        self.balance()
 
     def insert(self, index, sequence):
-        raise NotImplementedError
+        _, end = self.split(index)
+        self.join(self, Rope(sequence, leafsize=self.leafsize))
+        self.join(self, end)
+        self.balance()
 
     def split(self, index):
         raise NotImplementedError
