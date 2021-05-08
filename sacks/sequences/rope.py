@@ -23,13 +23,42 @@ class Rope(MutableSequence):
     def __init__(self, sequence='', *, leafsize=8, type=None):
         self._root = RopeInternal()
         self.leafsize = leafsize
-        self.type = type or type(sequence)
+        self.type = type or __builtins__['type'](sequence)
 
         if sequence:
             raise NotImplementedError
 
+    def _collapse(self):
+        """Remove all InternalNodes with EMPTY leaves.
+        """
+        raise self._root.collapse()
+
     def _balance(self):
-        raise NotImplementedError
+        root = self._root
+
+        if root.balance_factor > 1:
+            if root.left.balance_factor < 0:
+                root.left = self._rotate_left(root.left)  # left-right case
+            self._root = self._rotate_right(root)  # left-left case
+            self._balance()
+
+        elif root.balance_factor < -1:
+            if root.right.balance_factor > 0:
+                root.right = self._rotate_right(root.right)  # right-left case
+            self._root = self._rotate_left(root)  # right-right case
+            self._balance()
+
+    def _rotate_right(self, root):
+        pivot = root.left
+        root.left = pivot.right
+        pivot.right = root
+        return pivot
+
+    def _rotate_left(self, root):
+        pivot = root.right
+        root.right = pivot.left
+        pivot.left = root
+        return pivot
 
     def __getitem__(self, key):
         raise NotImplementedError
@@ -62,4 +91,4 @@ class Rope(MutableSequence):
         raise NotImplementedError
 
     def __str__(self):
-        raise NotImplementedError
+        return str(self._root)
