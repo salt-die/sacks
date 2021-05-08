@@ -1,15 +1,13 @@
 #######################################################################################
 # We've set up some machinery to simplify our Rope data structure:                    #
 #     * When left or right child of a RopeInternal node is set, the node will set     #
-#       itself as parent to that child. ↴                                             #
-#     ↳ When a RopeNode's parent is set it will add its weight to its parent's weight #
-#       (subtracting its weight from its old parent). ↴                               #
-#     ↳ When a RopeNode's weight is changed it will dispatch that change to its       #
+#       itself as parent to that child.                                               #
+#     * When a RopeNode's parent is set it will add its weight to its parent's weight #
+#       (subtracting its weight from its old parent).                                 #
+#     * When a RopeNode's weight is changed it will dispatch that change to its       #
 #       parent.                                                                       #
 #                                                                                     #
-# `EMPTY` is a constant for empty nodes. It implements `RopeNode` and so doesn't need #
-# special treatment from `RopeNode` methods (as one might if `None` was used for      #
-# empty nodes).                                                                       #
+# `EMPTY` is a sentinel node.  Nodes assigned to `None` will be converted to `EMPTY`. #
 #######################################################################################
 from abc import abstractmethod, ABC
 
