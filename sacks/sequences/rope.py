@@ -17,6 +17,11 @@ class Rope(MutableSequence):
 
     type:
         Type of sequence stored in leaf nodes.  Inferred from `sequence` if a sequence is provided. (default: str)
+
+    Notes
+    -----
+    The sequence type should have an `__add__` method.
+
     """
     __slots__ = '_root', 'leafsize', 'type',
 
@@ -27,6 +32,13 @@ class Rope(MutableSequence):
 
         if sequence:
             raise NotImplementedError
+
+    @property
+    def sequence(self):
+        return ''.join(self._root) if self.type is str else sum(self._root)
+
+    def __len__(self):
+        return self._root.weight
 
     def _collapse(self):
         """Remove all InternalNodes with EMPTY leaves.
@@ -39,13 +51,13 @@ class Rope(MutableSequence):
         if root.balance_factor > 1:
             if root.left.balance_factor < 0:
                 root.left = self._rotate_left(root.left)  # left-right case
-            self._root = self._rotate_right(root)  # left-left case
+            self._root = self._rotate_right(root)
             self._balance()
 
         elif root.balance_factor < -1:
             if root.right.balance_factor > 0:
                 root.right = self._rotate_right(root.right)  # right-left case
-            self._root = self._rotate_left(root)  # right-right case
+            self._root = self._rotate_left(root)
             self._balance()
 
     def _rotate_right(self, root):
@@ -69,26 +81,35 @@ class Rope(MutableSequence):
     def __delitem__(self, key):
         raise NotImplementedError
 
-    def __len__(self):
-        return self.root.weight
-
-    def insert(self, index, sequence):
-        raise NotImplementedError
-
     def __add__(self, other):
         if self.type != other.type:
             raise TypeError(f'Incompatible types: {self.type}, {other.type}')
 
         new_rope = Rope(leafsize=max(self.leafsize, other.leafsize), type=self.type)
-        new_rope.root.left = self.root.copy()
-        new_root.root.right = other.root.copy()
+        new_rope._root.left = self._root.copy()
+        new_rope._root.right = other._root.copy()
         return new_rope
+
+    def __iadd__(self, other):
+        if self.type != other.type:
+            raise TypeError(f'Incompatible types: {self.type}, {other.type}')
+
+        self._root = RopeInternal(self._root, other._root.copy())
+
+    def join(self, other):
+        self._root = RopeInternal(self._root, other._root)
+
+    def insert(self, index, sequence):
+        raise NotImplementedError
 
     def split(self, index):
         raise NotImplementedError
 
     def __repr__(self):
-        raise NotImplementedError
+        return f'{type(self).__name__}({self.sequence!r}, leafsize={self.leafsize}, type={self.type.__name__})'
 
     def __str__(self):
-        return str(self._root)
+        return str(self.sequence)
+
+    def prettyprint(self):
+        print(self._root)
