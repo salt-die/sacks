@@ -1,11 +1,11 @@
 from abc import ABCMeta
 from inspect import isgeneratorfunction, signature
 
-def noop(name='', default=None, repr='NOOP', abc=None, methods=None, attrs=None):
+def sentinel_node(name='', default=None, repr='SENTINEL', abc=None, methods=None, attrs=None):
     """
-    Build and return a "noop" object. Modifying attributes of this object
-    does nothing (are noops!). Methods in `abc` not provided in `methods` will
-    return `default`.  Attributes not in `attrs` will return `default`.
+    Build and return a better sentinel node! Don't settle for `None` or `object()`, you can do better:
+        * Modifying attributes of this object does nothing (with no errors).
+        * Abstract methods in `abc` (an abstract base class) not provided in `methods` will return `default`.
 
     Parameters
     ----------
@@ -13,13 +13,13 @@ def noop(name='', default=None, repr='NOOP', abc=None, methods=None, attrs=None)
         The type name. (default: '')
 
     default: Any
-        Return value for abstract methods and value for missing `attrs`. (default: None)
+        Return value for un-implemented abstract methods and `__getattr__`. (default: None)
 
     repr: str
-        `__repr__` string.  (default: 'NOOP')
+        `__repr__` string.  (default: 'SENTINEL')
 
     abc (optional): ABCMeta
-        An abstract base class for this object.
+        An abstract base class for this object. Abstract methods will be given a default implementation.
 
     methods (optional): dict
         Additional methods for this object.
@@ -49,13 +49,13 @@ def noop(name='', default=None, repr='NOOP', abc=None, methods=None, attrs=None)
     ```
 
     The issue is that `None` doesn't implement `Node` so we need to special-case it in all our methods.
-    Instead we can create an object that *does* implement Node:
+    Instead we can create a sentinel that *does* implement Node:
     ```
     def iter_nodes(self):
         return
         yield
 
-    EMPTY = noop(methods={ 'iter_nodes': iter_nodes })
+    EMPTY = sentinel(methods={ 'iter_nodes': iter_nodes })
     ```
 
     And now our class can be re-written:
@@ -71,7 +71,7 @@ def noop(name='', default=None, repr='NOOP', abc=None, methods=None, attrs=None)
             yield from self.right.iter_nodes()
     ```
 
-    A nicer implementation!
+    A nicer, simpler implementation!
     """
     attrs = attrs or { }
     methods = methods or { }

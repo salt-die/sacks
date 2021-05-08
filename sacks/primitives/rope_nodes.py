@@ -13,7 +13,7 @@
 #######################################################################################
 from abc import abstractmethod, ABC
 
-from ._noop import noop
+from ._sentinel import sentinel_node
 from ._tree_printer import tree_printer
 
 
@@ -68,7 +68,13 @@ class RopeNode(ABC):
         pass
 
 
-EMPTY = noop(name='RopeDeadEnd', repr='EMPTY', abc=RopeNode, methods={ 'copy': lambda self: self }, attrs={ 'weight': 0, 'height': 0 })
+EMPTY = sentinel_node(
+    name='RopeSentinel',
+    repr='EMPTY',
+    abc=RopeNode,
+    methods={ 'copy': lambda self: self },
+    attrs={ 'weight': 0, 'height': 0 }
+)
 
 
 class Child:
