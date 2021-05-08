@@ -34,15 +34,8 @@ class RopeNode(ABC):
     @parent.setter
     def parent(self, node):
         self._parent.weight -= self.weight
-
-        # Remove this node from its old parent.
-        if self._parent._left is self:
-            self._parent._left = EMPTY
-        elif self._parent._right is self:
-            self._parent._right = EMPTY
-
-        self._parent = node or EMPTY
-        self._parent.weight += self.weight
+        self._parent = node
+        node.weight += self.weight
 
     @property
     def weight(self):
@@ -70,7 +63,7 @@ EMPTY = sentinel_node(
     name='RopeSentinel',
     repr='EMPTY',
     abc=RopeNode,
-    methods={ 'copy': lambda self: self },
+    methods={ 'copy': lambda self: self, 'parent': property(lambda self: self) },
     attrs={ 'weight': 0, 'height': 0 }
 )
 
@@ -92,8 +85,15 @@ class Child:
     def __set__(self, instance, node):
         getattr(instance, self.name, EMPTY).parent = EMPTY
 
-        setattr(instance, self.name, node or EMPTY)
-        getattr(instance, self.name).parent = instance
+        node = node or EMPTY  # None or other falsy sentinels converted to EMPTY
+        # Scrub references to this node:
+        if node.parent._left is node:
+            node.parent._left = EMPTY
+        elif node.parent._right is node:
+            node.parent._right = EMPTY
+
+        setattr(instance, self.name, node)
+        node.parent = instance
 
 
 class RopeInternal(RopeNode):
@@ -123,18 +123,20 @@ class RopeInternal(RopeNode):
         if isinstance(self.right, RopeInternal):
             self.right.collapse()
 
-        if self.parent is not EMPTY:  # Special case for root.
-            if self.left is EMPTY:
-                only_child = self.right
-            elif self.right is EMPTY:
-                only_child = self.left
-            else:
-                return
+        if self.parent is EMPTY:  # Special case for root.
+            return
 
-            if self.parent.left is self:
-                self.parent.left = only_child
-            else:
-                self.parent.right = only_child
+        if self.left is EMPTY:
+            only_child = self.right
+        elif self.right is EMPTY:
+            only_child = self.left
+        else:
+            return
+
+        if self.parent.left is self:
+            self.parent.left = only_child
+        else:
+            self.parent.right = only_child
 
     @property
     def height(self):
