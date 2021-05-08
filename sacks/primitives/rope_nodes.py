@@ -58,13 +58,19 @@ class RopeNode(ABC):
     def copy(self):
         pass
 
+    @abstractmethod
+    def query(self, i):
+        """Return the node that contains index `i` and the index of that node's sequence that corresponds to `i`.
+        """
+        pass
+
 
 EMPTY = sentinel_node(
     name='RopeSentinel',
     repr='EMPTY',
     abc=RopeNode,
     methods={ 'copy': lambda self: self, 'parent': property(lambda self: self) },
-    attrs={ 'weight': 0, 'height': 0 }
+    attrs={ 'weight': 0, 'height': 0 },
 )
 
 
@@ -154,6 +160,12 @@ class RopeInternal(RopeNode):
     def copy(self):
         return type(self)(self.left.copy(), self.right.copy())
 
+    def query(self, i):
+        if i >= self.left.weight:
+            return self.right.query(i - self.left.weight)
+
+        return self.left.query(i)
+
     def __repr__(self):
         return f'{type(self).__name__}(left={self.left!r}, right={self.right!r})'
 
@@ -196,6 +208,9 @@ class RopeLeaf(RopeNode):
 
     def copy(self):
         return type(self)(self.sequence)
+
+    def query(self, i):
+        return self, i
 
     def __repr__(self):
         return f'{type(self).__name__}(sequence={self.sequence!r})'
