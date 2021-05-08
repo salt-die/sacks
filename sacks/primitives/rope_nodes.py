@@ -7,8 +7,8 @@
 #     * When a RopeNode's weight is changed it will dispatch that change to its       #
 #       parent.                                                                       #
 #                                                                                     #
-# `EMPTY` is a sentinel node.  Child nodes assigned to falsey values will be          #
-# converted to `EMPTY`.                                                               #
+# `EMPTY` is a sentinel node.  Child nodes assigned to falsy values will be converted #
+# to `EMPTY`.                                                                         #
 #######################################################################################
 from abc import abstractmethod, ABC
 
