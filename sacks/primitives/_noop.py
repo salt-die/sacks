@@ -5,7 +5,7 @@ def noop(name='', default=None, repr='NOOP', abc=None, methods=None, attrs=None)
     """
     Build and return a "noop" object. Modifying attributes of this object
     does nothing (are noops!). Methods in `abc` not provided in `methods` will
-    return `_default`.  Attributes not in `attrs` will return `_default`.
+    return `default`.  Attributes not in `attrs` will return `default`.
 
     Parameters
     ----------
