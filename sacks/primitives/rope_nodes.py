@@ -21,7 +21,7 @@ class Strand(ABC):
 
     A Strand serves three purposes:
         1) Provide a means for a child to remove its parent's reference to it.
-        2) Communicate changes in weight from the child to the parent (left strands only).
+        2) Communicate changes in weight from the child to the parent.
         3) Provide a way for collapsing nodes to attach their child to their parent.
     """
     __slots__ = 'parent',
@@ -33,20 +33,20 @@ class Strand(ABC):
     def cut(self):
         """Remove parent's reference to a child.
         """
-        ...
+        pass
 
     @abstractmethod
     def dispatch_weight(self, delta):
-        ...
+        pass
 
     @abstractmethod
     def attach(self, child):
-        ...
+        pass
 
 
 class LeftStrand(Strand):
     def cut(self):
-        self.parent.weight -= self.parent.left.weight
+        self.dispatch_weight(-self.parent.left.weight)
         self.parent._left._strand = DANGLING
         self.parent._left = EMPTY
 
@@ -59,11 +59,12 @@ class LeftStrand(Strand):
 
 class RightStrand(Strand):
     def cut(self):
+        self.dispatch_weight(-self.parent.right.weight)
         self.parent.right._strand = DANGLING
         self.parent._right = EMPTY
 
     def dispatch_weight(self, delta):
-        pass
+        self.parent.strand.dispatch_weight(delta)
 
     def attach(self, child):
         self.parent.right = child
@@ -148,6 +149,7 @@ class RopeInternal(RopeNode):
 
     def __init__(self, left=EMPTY, right=EMPTY):
         super().__init__()
+        self._left = self._right = EMPTY
         self.left = left
         self.right = right
 
@@ -157,7 +159,7 @@ class RopeInternal(RopeNode):
 
     @left.setter
     def left(self, node):
-        getattr(self, '_left', EMPTY).strand.cut()
+        self._left.strand.cut()
         self._left = node or EMPTY
         self._left.strand = LeftStrand(self)
 
@@ -167,7 +169,7 @@ class RopeInternal(RopeNode):
 
     @right.setter
     def right(self, node):
-        getattr(self, '_right', EMPTY).strand.cut()
+        self._right.strand.cut()
         self._right = node or EMPTY
         self._right.strand = RightStrand(self)
 
@@ -209,8 +211,8 @@ class RopeInternal(RopeNode):
         return type(self)(self.left.copy(), self.right.copy())
 
     def query(self, i):
-        if i >= self.left.weight:
-            return self.right.query(i - self.left.weight)
+        if i >= self.weight:
+            return self.right.query(i - self.weight)
 
         return self.left.query(i)
 
