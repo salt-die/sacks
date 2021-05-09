@@ -13,12 +13,12 @@ An odd collection of odd collections!
 * primitives
     * Block - Element of a doubly-linked list.
     * RadixNode - A node of an Adaptive Radix Tree.
-    * RopeInternal, RopeLeaf - Nodes of a Rope. (*unfinished*)
+    * RopeInternal, RopeLeaf - Nodes of a Rope.
 * sequences
     * IndexedSet - An indexable set.
     * Necklace - An immutable sequence that "wraps-around".
     * RingBuffer - A FIFO buffer with a fixed size.
-    * Rope - A binary-tree that allows efficient manipulation of variable-length types. (*unfinished*)
+    * Rope - A binary-tree that allows efficient manipulation of variable-length types.
     * View - A mutable view of a sequence.
 * sets
     * BloomFilter - A memory-efficient data structure with probabalistic membership checks.  (requires `bitarray`)
