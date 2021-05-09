@@ -1,14 +1,32 @@
-#######################################################################################
-# We've set up some machinery to simplify our Rope data structure:                    #
-#     * When left or right child of a RopeInternal node is set, the node will set     #
-#       itself as parent to that child.                                               #
-#     * When a RopeNode's parent is set it will add its weight to its parent's weight #
-#       (subtracting its weight from its old parent).                                 #
-#     * When a RopeNode's weight is changed it will dispatch that change to its       #
-#       parent.                                                                       #
-#                                                                                     #
-# `left` or `right` nodes assigned to falsy values will be converted to `EMPTY`.      #
-#######################################################################################
+##############################################################################################
+# We've built out a lot of machinery to simplify our Rope class:                             #
+#     * Strands are channels of communication between a child node and its parent.           #
+#     * When a child node is set, a RopeInternal node will cut the child's previous strand   #
+#       (so that the child's previous parent no longer references it) and create a new       #
+#       strand for that child.                                                               #
+#     * Child nodes dispatch any weight changes through the strand to their parent.          #
+#                                                                                            #
+# With all this built we can create trees very simply:                                       #
+# ```                                                                                        #
+# In [1]: from sacks.primitives import RopeInternal, RopeLeaf                                #
+#    ...:                                                                                    #
+#    ...: root = RopeInternal()                                                              #
+#    ...: python = RopeLeaf('python')                                                        #
+#    ...: data = RopeLeaf('data')                                                            #
+#    ...: structures = RopeLeaf('structures')                                                #
+#    ...: root.left = python                                                                 #
+#    ...: root.right = RopeInternal(data, structures)                                        #
+#                                                                                            #
+# In [2]: print(root)                                                                        #
+# 6                                                                                          #
+# ├─6 - 'python'                                                                             #
+# ╰─4                                                                                        #
+#   ├─4 - 'data'                                                                             #
+#   ╰─10 - 'structures'                                                                      #
+#```                                                                                         #
+# (Note that weight of an internal node is the sum of weights of its left sub-tree.)         #
+# All the linking, de-referencing, and dispatching is handled!                               #
+##############################################################################################
 from abc import abstractmethod, ABC
 
 from ._sentinel import sentinel
@@ -123,7 +141,7 @@ class RopeNode(ABC):
         """
         pass
 
-
+# Sentinel objects for missing leaves and half-strands respectively.
 EMPTY = sentinel(
     name='RopeSentinel',
     repr='EMPTY',
