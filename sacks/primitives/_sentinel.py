@@ -1,9 +1,9 @@
 from abc import ABCMeta
 from inspect import isgeneratorfunction, signature
 
-def sentinel_node(name='', default=None, repr='SENTINEL', abc=None, methods=None, attrs=None):
+def sentinel(name='', default=None, repr='SENTINEL', abc=None, methods=None, attrs=None):
     """
-    Build and return a better sentinel node! Don't settle for `None` or `object()`, you can do better:
+    Build and return a better sentinel! Don't settle for `None` or `object()`, you can do better!:
         * Modifying attributes of this object does nothing (with no errors).
         * Abstract methods in `abc` (an abstract base class) not provided in `methods` will return `default`.
 
