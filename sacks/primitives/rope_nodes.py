@@ -1,32 +1,3 @@
-##############################################################################################
-# We've built out a lot of machinery to simplify our Rope class:                             #
-#     * Strands are channels of communication between a child node and its parent.           #
-#     * When a child node is set, a RopeInternal node will cut the child's previous strand   #
-#       (so that the child's previous parent no longer references it) and create a new       #
-#       strand for that child.                                                               #
-#     * Child nodes dispatch any weight changes through the strand to their parent.          #
-#                                                                                            #
-# With all this built we can create trees very simply:                                       #
-# ```                                                                                        #
-# In [1]: from sacks.primitives import RopeInternal, RopeLeaf                                #
-#    ...:                                                                                    #
-#    ...: root = RopeInternal()                                                              #
-#    ...: python = RopeLeaf('python')                                                        #
-#    ...: data = RopeLeaf('data')                                                            #
-#    ...: structures = RopeLeaf('structures')                                                #
-#    ...: root.left = python                                                                 #
-#    ...: root.right = RopeInternal(data, structures)                                        #
-#                                                                                            #
-# In [2]: print(root)                                                                        #
-# 6                                                                                          #
-# ├─6 - 'python'                                                                             #
-# ╰─4                                                                                        #
-#   ├─4 - 'data'                                                                             #
-#   ╰─10 - 'structures'                                                                      #
-#```                                                                                         #
-# (Note that weight of an internal node is the sum of weights of its left sub-tree.)         #
-# All the linking, de-referencing, and dispatching is handled!                               #
-##############################################################################################
 from abc import abstractmethod, ABC
 
 from ._sentinel import sentinel
@@ -35,12 +6,7 @@ from ._tree_printer import tree_printer
 
 class Strand(ABC):
     """
-    A channel between a Node and its parent.
-
-    A Strand serves three purposes:
-        1) Provide a means for a child to remove its parent's reference to it.
-        2) Communicate changes in weight from the child to the parent.
-        3) Provide a way for collapsing nodes to attach their child to their parent.
+    A channel between a node and its parent.
     """
     __slots__ = 'parent',
 
@@ -141,6 +107,10 @@ class RopeNode(ABC):
         """
         pass
 
+    @abstractmethod
+    def split(self, i, orphans=None):
+        pass
+
 # Sentinel objects for missing leaves and half-strands respectively.
 EMPTY = sentinel(
     name='RopeSentinel',
@@ -234,6 +204,17 @@ class RopeInternal(RopeNode):
 
         return self.left.query(i)
 
+    def split(self, i, orphans=None):
+        if orphans is None:
+            orphans = [ ]
+
+        if i >= self.weight:
+            return self.right.split(i - self.weight, orphans)
+
+        orphans.append(self.right)
+        self.right = EMPTY
+        return self.left.split(i, orphans)
+
     def __repr__(self):
         return f'{type(self).__name__}(left={self.left!r}, right={self.right!r})'
 
@@ -282,6 +263,18 @@ class RopeLeaf(RopeNode):
 
     def query(self, i):
         return self, i
+
+    def split(self, i, orphans=None):
+        if orphans is None:
+            orphans = [ ]
+
+        orphans.append(RopeLeaf(self.sequence[i:]))
+        self.sequence = self.sequence[:i]
+
+        root = orphans.pop()
+        while orphans:
+            root = RopeInternal(root, orphans.pop())
+        return root
 
     def __repr__(self):
         return f'{type(self).__name__}(sequence={self.sequence!r})'
