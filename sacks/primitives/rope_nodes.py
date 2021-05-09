@@ -60,7 +60,7 @@ class LeftStrand(Strand):
 class RightStrand(Strand):
     def cut(self):
         self.dispatch_weight(-self.parent.right.weight)
-        self.parent.right._strand = DANGLING
+        self.parent._right._strand = DANGLING
         self.parent._right = EMPTY
 
     def dispatch_weight(self, delta):
