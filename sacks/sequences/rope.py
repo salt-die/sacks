@@ -24,12 +24,13 @@ class Rope(MutableSequence):
     The sequence type should have an `__add__` method.
 
     """
-    __slots__ = '_root', 'leafsize', 'type',
+    __slots__ = '_root', 'leafsize', 'type', '_len',
 
     def __init__(self, sequence='', *, leafsize=8, type=None):
         self._root = RopeInternal()
         self.leafsize = leafsize
         self.type = type or __builtins__['type'](sequence)
+        self._len = 0
 
         if sequence:
             raise NotImplementedError
@@ -39,7 +40,7 @@ class Rope(MutableSequence):
         return ''.join(self._root) if self.type is str else sum(self._root)
 
     def __len__(self):
-        return self._root.weight
+        return self._len
 
     def _collapse(self):
         """Replace all RopeInternal nodes with EMPTY leaves with their non-EMPTY child.
@@ -56,12 +57,13 @@ class Rope(MutableSequence):
         root.left = self._balance(root.left)
         root.right = self._balance(root.right)
 
-        if root.balance_factor > 1:
+        factor = root.balance_factor
+        if factor > 1:
             if root.left.balance_factor < 0:
                 root.left = self._rotate_left(root.left)  # left-right case
             root = self._rotate_right(root)
 
-        elif root.balance_factor < -1:
+        elif factor < -1:
             if root.right.balance_factor > 0:
                 root.right = self._rotate_right(root.right)  # right-left case
             root = self._rotate_left(root)
