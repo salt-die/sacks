@@ -7,36 +7,91 @@
 #     * When a RopeNode's weight is changed it will dispatch that change to its       #
 #       parent.                                                                       #
 #                                                                                     #
-# `EMPTY` is a sentinel node.  Child nodes assigned to falsy values will be converted #
-# to `EMPTY`.                                                                         #
+# `left` or `right` nodes assigned to falsy values will be converted to `EMPTY`.      #
 #######################################################################################
 from abc import abstractmethod, ABC
 
-from ._sentinel import sentinel_node
+from ._sentinel import sentinel
 from ._tree_printer import tree_printer
+
+
+class Strand(ABC):
+    """
+    A channel between a Node and its parent.
+
+    A Strand serves three purposes:
+        1) Provide a means for a child to remove its parent's reference to it.
+        2) Communicate changes in weight from the child to the parent (left strands only).
+        3) Provide a way for collapsing nodes to attach their child to their parent.
+    """
+    __slots__ = 'parent',
+
+    def __init__(self, parent):
+        self.parent = parent
+
+    @abstractmethod
+    def cut(self):
+        """Remove parent's reference to a child.
+        """
+        ...
+
+    @abstractmethod
+    def dispatch_weight(self, delta):
+        ...
+
+    @abstractmethod
+    def attach(self, child):
+        ...
+
+
+class LeftStrand(Strand):
+    def cut(self):
+        self.parent.weight -= self.parent.left.weight
+        self.parent._left._strand = DANGLING
+        self.parent._left = EMPTY
+
+    def dispatch_weight(self, delta):
+        self.parent.weight += delta
+
+    def attach(self, child):
+        self.parent.left = child
+
+
+class RightStrand(Strand):
+    def cut(self):
+        self.parent.right._strand = DANGLING
+        self.parent._right = EMPTY
+
+    def dispatch_weight(self, delta):
+        pass
+
+    def attach(self, child):
+        self.parent.right = child
 
 
 class RopeNode(ABC):
     """
     The base primitive of a Rope.
-
-    A Rope is a binary-tree that allows efficient manipulation of variable-length types.
     """
-    __slots__ = '_parent', '_weight',
+    __slots__ = '_strand', '_weight',
 
     def __init__(self):
-        self._parent = EMPTY
+        self._strand = DANGLING
         self._weight = 0
 
     @property
     def parent(self):
-        return self._parent
+        return self._strand.parent
 
-    @parent.setter
-    def parent(self, node):
-        self._parent.weight -= self.weight
-        self._parent = node
-        node.weight += self.weight
+    @property
+    def strand(self):
+        return self._strand
+
+    @strand.setter
+    def strand(self, strand):
+        self._strand.cut()
+        self._strand = strand
+        strand.dispatch_weight(self.weight)
 
     @property
     def weight(self):
@@ -44,7 +99,7 @@ class RopeNode(ABC):
 
     @weight.setter
     def weight(self, value):
-        self._parent.weight += value - self._weight
+        self._strand.dispatch_weight(value - self._weight)
         self._weight = value
 
     @abstractmethod
@@ -68,41 +123,22 @@ class RopeNode(ABC):
         pass
 
 
-EMPTY = sentinel_node(
+EMPTY = sentinel(
     name='RopeSentinel',
     repr='EMPTY',
     abc=RopeNode,
-    methods={ 'copy': lambda self: self, 'parent': property(lambda self: self) },
-    attrs={ 'weight': 0, 'height': 0 },
+    methods={ 'copy': lambda self: self },
+    attrs={ '_weight': 0, 'height': 0 },
 )
 
+DANGLING = sentinel(
+    name='HalfStrand',
+    repr='DANGLING',
+    abc=Strand,
+    attrs={ 'parent': EMPTY }
+)
 
-class Child:
-    """
-    Child node of RopeInternal.
-
-    This property will automatically set internal node as parent to its child.
-    """
-    __slots__ = 'name',
-
-    def __set_name__(self, owner, name):
-        self.name = '_' + name
-
-    def __get__(self, instance, owner):
-        return getattr(instance, self.name)
-
-    def __set__(self, instance, node):
-        getattr(instance, self.name, EMPTY).parent = EMPTY
-
-        node = node or EMPTY  # None or other falsy sentinels converted to EMPTY
-        # Scrub references to this node:
-        if node.parent._left is node:
-            node.parent._left = EMPTY
-        elif node.parent._right is node:
-            node.parent._right = EMPTY
-
-        setattr(instance, self.name, node)
-        node.parent = instance
+object.__setattr__(EMPTY, '_strand', DANGLING)
 
 
 class RopeInternal(RopeNode):
@@ -110,14 +146,30 @@ class RopeInternal(RopeNode):
     """
     __slots__ = '_left', '_right',
 
-    left = Child()
-    right = Child()
-
     def __init__(self, left=EMPTY, right=EMPTY):
         super().__init__()
-
         self.left = left
         self.right = right
+
+    @property
+    def left(self):
+        return self._left
+
+    @left.setter
+    def left(self, node):
+        getattr(self, '_left', EMPTY).strand.cut()
+        self._left = node or EMPTY
+        self._left.strand = LeftStrand(self)
+
+    @property
+    def right(self):
+        return self._right
+
+    @right.setter
+    def right(self, node):
+        getattr(self, '_right', EMPTY).strand.cut()
+        self._right = node or EMPTY
+        self._right.strand = RightStrand(self)
 
     @property
     def balance_factor(self):
@@ -132,20 +184,13 @@ class RopeInternal(RopeNode):
         if isinstance(self.right, RopeInternal):
             self.right.collapse()
 
-        if self.parent is EMPTY:  # Special case for root.
+        if self.strand is DANGLING:  # Special case for root.
             return
 
         if self.left is EMPTY:
-            only_child = self.right
+            self.strand.attach(self.right)
         elif self.right is EMPTY:
-            only_child = self.left
-        else:
-            return
-
-        if self.parent.left is self:
-            self.parent.left = only_child
-        else:
-            self.parent.right = only_child
+            self.strand.attach(self.left)
 
     @property
     def height(self):
