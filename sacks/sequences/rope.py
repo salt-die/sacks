@@ -39,9 +39,8 @@ class Rope(MutableSequence):
 
     def _from_sequence(self, sequence, root):
         size = len(sequence)
-        if size <= self.leafsize:
-            root.left = RopeLeaf(sequence)
-        elif size <= self.leafsize * 2:
+
+        if size <= self.leafsize * 2:
             root.left = RopeLeaf(sequence[:size//2])
             root.right = RopeLeaf(sequence[size//2:])
         else:
@@ -50,21 +49,31 @@ class Rope(MutableSequence):
             self._from_sequence(sequence[:size//2], root.left)
             self._from_sequence(sequence[size//2:], root.right)
 
+    def __len__(self):
+        return self._len
+
+    def __iter__(self):
+        for seq in self._root:
+            yield from seq
+
     @property
     def sequence(self):
+        """A monolithic sum of all the leaves of this rope.
+        """
         return ''.join(self._root) if self.type is str else sum(self._root)
 
     @property
     def balance_factor(self):
+        """The difference in heights of the left and right sides of this rope.
+        """
         return self._root.balance_factor
 
     def copy(self):
+        """Return a copy of this rope.
+        """
         copy = Rope(leafsize=self.leafsize, type=self.type)
         copy._root = self._root.copy()
         return copy
-
-    def __len__(self):
-        return self._len
 
     def collapse(self):
         """Remove all non-internal 0 weight nodes.
@@ -107,10 +116,6 @@ class Rope(MutableSequence):
         root.right = pivot.left
         pivot.left = root
         return pivot
-
-    def __iter__(self):
-        for seq in self._root:
-            yield from seq
 
     def _normalize_index(self, index):
         """Common functionality for parsing slices for __getitem__, __setitem__, and __delitem__.
@@ -176,11 +181,15 @@ class Rope(MutableSequence):
         return self
 
     def append(self, sequence):
+        """Append the sequence to the end of the rope.
+        """
         self.join(Rope(sequence, leafsize=self.leafsize))
         self._len += len(sequence)
 
     def join(self, other):
         """
+        Join `other` to this rope.
+
         Warning
         -------
         This doesn't copy.  `other` will be a view inside `self` or vice-versa.  Modifications to one will affect the other.
@@ -188,7 +197,9 @@ class Rope(MutableSequence):
         """
         if self.type != other.type:
             raise TypeError(f'Incompatible types: {self.type}, {other.type}')
+
         balance = self._root.height - other._root.height
+
         if balance < -1:
             self._join_right(other, balance)
         elif balance > 1:
@@ -222,6 +233,8 @@ class Rope(MutableSequence):
         right_most.strand.attach(RopeInternal(right_most, other._root))
 
     def insert(self, index, sequence):
+        """Insert sequence before `index`.
+        """
         _, end = self.split(index)
         self.join(Rope(sequence, leafsize=self.leafsize))
         self.join(end)
@@ -229,6 +242,8 @@ class Rope(MutableSequence):
         self._len += len(sequence)
 
     def split(self, index):
+        """Split the rope at `index`.  Return both ends of split.
+        """
         right = Rope(leafsize=self.leafsize)
         right._root = self._root.split(index)
         right._len = self._len - index
