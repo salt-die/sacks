@@ -302,7 +302,6 @@ class RopeLeaf(RopeNode):
         while orphans:
             root = RopeInternal(root, orphans.pop())
 
-        root.strand.cut()
         return root
 
     def slice(self, start, length, nodes=None):
