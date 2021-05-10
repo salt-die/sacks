@@ -21,7 +21,7 @@ class Rope(MutableSequence):
 
     Notes
     -----
-    The sequence type should have an `__add__` method.
+    The sequence type should be sliceable and have an `__add__` method.
 
     """
     __slots__ = '_root', 'leafsize', 'type', '_len',
@@ -34,8 +34,7 @@ class Rope(MutableSequence):
 
         if sequence:
             self._from_sequence(sequence, self._root)
-            self._collapse()
-            self.balance()
+            self.collapse()
 
     def _from_sequence(self, sequence, root):
         size = len(sequence)
@@ -54,6 +53,10 @@ class Rope(MutableSequence):
     def sequence(self):
         return ''.join(self._root) if self.type is str else sum(self._root)
 
+    @property
+    def balance_factor(self):
+        return self._root.balance_factor
+
     def copy(self):
         copy = Rope(leafsize=self.leafsize, type=self.type)
         copy._root = self._root.copy()
@@ -62,12 +65,14 @@ class Rope(MutableSequence):
     def __len__(self):
         return self._len
 
-    def _collapse(self):
-        """Replace all RopeInternal nodes with EMPTY leaves with their non-EMPTY child.
+    def collapse(self):
+        """Remove all non-internal 0 weight nodes.
         """
         self._root.collapse()
 
     def balance(self):
+        """Balance the tree.
+        """
         self._root = self._balance(self._root)
 
     def _balance(self, root):
@@ -125,35 +130,34 @@ class Rope(MutableSequence):
         return start, stop - start
 
     def __getitem__(self, key):
-        first_split, second_split = self._normalize_index(key)
+        start, length = self._normalize_index(key)
 
-        #FIXME: This is inefficient
-        _, other = self.split(first_split)
-        _, end = other.split(second_split)
-
-        sequence = other.sequence
-        self.join(other)
-        self.join(end)
-        return sequence
+        if self.type is str:
+            return "".join(self._root.slice(start, length))
+        return sum(self._root.slice(start, length))
 
     def __setitem__(self, key, sequence):
         first_split, second_split = self._normalize_index(key)
 
-        self._len -= second_split + len(sequence)
-
         _, other = self.split(first_split)
         _, end = other.split(second_split)
+
         self.join(Rope(sequence, leafsize=self.leafsize))
         self.join(end)
+        self.collapse()
+
+        self._len -= second_split + len(sequence)
 
     def __delitem__(self, key):
         first_split, second_split = self._normalize_index(key)
 
-        self._len -= second_split
-
         _, other = self.split(first_split)
         _, end = other.split(second_split)
+
         self.join(end)
+        self.collapse()
+
+        self._len -= second_split
 
     def __add__(self, other):
         if self.type != other.type:
@@ -171,45 +175,66 @@ class Rope(MutableSequence):
         return self
 
     def append(self, sequence):
-        self += Rope(sequence, leafsize=self.leafsize)
+        self.join(Rope(sequence, leafsize=self.leafsize))
         self._len += len(sequence)
 
     def join(self, other):
+        """
+        Warning
+        -------
+        This doesn't copy.  `other` will be a view inside `self` or vice-versa.  Modifications to one will affect the other.
+
+        """
         if self.type != other.type:
             raise TypeError(f'Incompatible types: {self.type}, {other.type}')
+        balance = self._root.height - other._root.height
+        if balance < -1:
+            self._join_right(other, balance)
+        elif balance > 1:
+            self._join_left(other, balance)
+        else:
+            self._root = RopeInternal(self._root, other._root)
 
         self._len += len(other)
 
-        # FIXME: This is inefficient
-        self._root = RopeInternal(self._root, other._root)
-        self.balance()
-        # if self._root.height == other._root.height:
-        #     self._root = RopeInternal(self._root, other._root)
-        # elif self._root.height > other._root.height:
-        #     self._join_right(self, other)
-        # else:
-        #     self._join_left(self, other)
+    def _join_right(self, other, balance):
+        left_most = other._root
+        while balance < 0:
+            if isinstance(left_most, RopeInternal):
+                left_most = left_most.left
+                balance += 1
+            else: # Either `other` isn't balanced or the left-most path is too short.  Either way, we're done.
+                break
 
-    def _join_right(self, other):
-        raise NotImplementedError
+        left_most.strand.attach(RopeInternal(self._root, left_most))
+        self._root = other._root
 
-    def _join_left(self, other):
-        raise NotImplementedError
+    def _join_left(self, other, balance):
+        right_most = self._root
+        while balance > 0:
+            if isinstance(right_most, RopeInternal):
+                right_most = right_most.right
+                balance -= 1
+            else: # Either `self` isn't balanced or the right-most path is too short.  Either way, we're done.
+                break
+
+        right_most.strand.attach(RopeInternal(right_most, other._root))
 
     def insert(self, index, sequence):
-        self._len += len(sequence)
         _, end = self.split(index)
         self.join(Rope(sequence, leafsize=self.leafsize))
         self.join(end)
 
+        self._len += len(sequence)
+
     def split(self, index):
         right = Rope(leafsize=self.leafsize)
         right._root = self._root.split(index)
-        right.balance()
-        self.balance()
-
         right._len = self._len - index
+        right.collapse()
+
         self._len = index
+        self.collapse()
 
         return self, right
 
