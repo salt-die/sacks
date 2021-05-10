@@ -290,14 +290,11 @@ class RopeLeaf(RopeNode):
         return self, i
 
     def split(self, i, orphans=None):
-        if orphans is None:
-            orphans = [ ]
-
         root = RopeLeaf(self.sequence[i:])
         self.sequence = self.sequence[:i]
 
         if not orphans:
-            root = RopeInternal(root)
+            return RopeInternal(root)
 
         while orphans:
             root = RopeInternal(root, orphans.pop())
