@@ -121,8 +121,12 @@ class Rope(MutableSequence):
         """Common functionality for parsing slices for __getitem__, __setitem__, and __delitem__.
         """
         if isinstance(index, int):
-            if index > len(self):
+            if index < -len(self) or index >= len(self):
                 raise IndexError('index out of range')
+
+            if index < 0:
+                index += len(self)
+
             start, stop, step = index, index + 1, 1
         else:
             start, stop, step = index.indices(len(self))
@@ -235,6 +239,8 @@ class Rope(MutableSequence):
     def insert(self, index, sequence):
         """Insert sequence before `index`.
         """
+        index, _ = self._normalize_index(index)
+
         _, end = self.split(index)
         self.join(Rope(sequence, leafsize=self.leafsize))
         self.join(end)
@@ -244,6 +250,8 @@ class Rope(MutableSequence):
     def split(self, index):
         """Split the rope at `index`.  Return both ends of split.
         """
+        index, _ = self._normalize_index(index)
+
         right = Rope(leafsize=self.leafsize)
         right._root = self._root.split(index)
         right._len = self._len - index
