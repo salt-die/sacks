@@ -1,3 +1,4 @@
+# TODO: Keep track of how "messy" a tree is so we can coalesce many short leaves and rebalance.
 from collections.abc import MutableSequence
 from functools import wraps
 
