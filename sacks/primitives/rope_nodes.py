@@ -293,12 +293,15 @@ class RopeLeaf(RopeNode):
         if orphans is None:
             orphans = [ ]
 
-        orphans.append(RopeLeaf(self.sequence[i:]))
+        root = RopeLeaf(self.sequence[i:])
         self.sequence = self.sequence[:i]
 
-        root = orphans.pop()
+        if not orphans:
+            root = RopeInternal(root)
+
         while orphans:
             root = RopeInternal(root, orphans.pop())
+
         root.strand.cut()
         return root
 
