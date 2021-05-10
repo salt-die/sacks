@@ -5,8 +5,7 @@ from ._tree_printer import tree_printer
 
 
 class Strand(ABC):
-    """
-    A channel between a node and its parent.
+    """A channel between a node and its parent.
     """
     __slots__ = 'parent',
 
@@ -25,12 +24,14 @@ class Strand(ABC):
 
     @abstractmethod
     def attach(self, child):
+        """Replace owner of this strand with `child` as `self.parent`'s child.
+        """
         pass
 
 
 class LeftStrand(Strand):
     def cut(self):
-        self.dispatch_weight(-self.parent.left.weight)
+        self.dispatch_weight(-sum(map(len, self.parent.left)))
         self.parent._left._strand = DANGLING
         self.parent._left = EMPTY
 
@@ -43,7 +44,7 @@ class LeftStrand(Strand):
 
 class RightStrand(Strand):
     def cut(self):
-        self.dispatch_weight(-self.parent.right.weight)
+        self.dispatch_weight(-sum(map(len, self.parent.right)))
         self.parent._right._strand = DANGLING
         self.parent._right = EMPTY
 
@@ -55,8 +56,7 @@ class RightStrand(Strand):
 
 
 class RopeNode(ABC):
-    """
-    The base primitive of a Rope.
+    """The base primitive of a Rope.
     """
     __slots__ = '_strand', '_weight',
 
@@ -76,7 +76,7 @@ class RopeNode(ABC):
     def strand(self, strand):
         self._strand.cut()
         self._strand = strand
-        strand.dispatch_weight(self.weight)
+        strand.dispatch_weight(sum(map(len, self)))
 
     @property
     def weight(self):
@@ -109,6 +109,14 @@ class RopeNode(ABC):
 
     @abstractmethod
     def split(self, i, orphans=None):
+        """Split the tree at index `i`.  Return the root nodes for both trees.
+        """
+        pass
+
+    @abstractmethod
+    def slice(self, start, length, nodes=None):
+        """Yield sequences starting at index `start` until the sum of their lengths reaches `length`.
+        """
         pass
 
 # Sentinel objects for missing leaves and half-strands respectively.
@@ -163,7 +171,9 @@ class RopeInternal(RopeNode):
 
     @property
     def balance_factor(self):
-        return self.left.height - self.right.height  # TODO: Keep this updated as tree is mutated
+        # For AVL trees one can keep this updated as nodes are inserted, but Ropes can be joined arbitrarily
+        # which complicates the matter.  For now we'll make do with recalculating as needed:
+        return self.left.height - self.right.height
 
     def collapse(self):
         """Trim all empty leaves from the tree.
@@ -177,9 +187,9 @@ class RopeInternal(RopeNode):
         if self.strand is DANGLING:  # Special case for root.
             return
 
-        if self.left is EMPTY:
+        if not self.left:
             self.strand.attach(self.right)
-        elif self.right is EMPTY:
+        elif not self.right:
             self.strand.attach(self.left)
 
     @property
@@ -212,8 +222,19 @@ class RopeInternal(RopeNode):
             return self.right.split(i - self.weight, orphans)
 
         orphans.append(self.right)
-        self.right = EMPTY
         return self.left.split(i, orphans)
+
+    def slice(self, start, length, nodes=None):
+        if nodes is None:
+            nodes = [ ]
+
+        if start >= self.weight:
+            return self.right.slice(start - self.weight, length, nodes)
+
+        if length > self.weight - start:
+            nodes.append(self.right)
+
+        return self.left.slice(start, length, nodes)
 
     def __repr__(self):
         return f'{type(self).__name__}(left={self.left!r}, right={self.right!r})'
@@ -226,6 +247,7 @@ class RopeInternal(RopeNode):
         -----
         Left nodes are printed above right nodes so that one can read the nodes in
         order from top to bottom.
+
         """
         return '\n'.join(tree_printer(str(self.weight), (self.left, self.right)))
 
@@ -247,6 +269,9 @@ class RopeLeaf(RopeNode):
     def sequence(self, seq):
         self._sequence = seq
         self.weight = len(seq)
+
+    def __bool__(self):
+        return bool(self.weight)
 
     @property
     def height(self):
@@ -274,7 +299,28 @@ class RopeLeaf(RopeNode):
         root = orphans.pop()
         while orphans:
             root = RopeInternal(root, orphans.pop())
+        root.strand.cut()
         return root
+
+    def slice(self, start, length, nodes=None):
+        if nodes is None:
+            nodes = [ ]
+
+        length_to_go = length - (len(self.sequence) - start)
+        yield self.sequence[start:start + length]
+
+        while nodes and length_to_go:
+            node = nodes.pop()
+            for sequence in node:
+                if len(sequence) <= length_to_go:
+                    yield sequence
+                    length_to_go -= len(sequence)
+                else:
+                    yield sequence[:length_to_go]
+                    length_to_go = 0
+
+                if length_to_go == 0:
+                    break
 
     def __repr__(self):
         return f'{type(self).__name__}(sequence={self.sequence!r})'
