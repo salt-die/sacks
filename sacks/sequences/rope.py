@@ -60,7 +60,7 @@ class Rope(MutableSequence):
     def sequence(self):
         """A monolithic sum of all the leaves of this rope.
         """
-        return ''.join(self._root) if self.type is str else sum(self._root)
+        return ''.join(self._root) if self.type is str else sum(self._root, self.type())
 
     @property
     def balance_factor(self):
@@ -252,7 +252,7 @@ class Rope(MutableSequence):
         """
         index, _ = self._normalize_index(index)
 
-        right = Rope(leafsize=self.leafsize)
+        right = Rope(leafsize=self.leafsize, type=self.type)
         right._root = self._root.split(index)
         right._len = self._len - index
         right.collapse()
