@@ -305,24 +305,20 @@ class RopeLeaf(RopeNode):
         return root
 
     def slice(self, start, length, nodes=None):
-        if nodes is None:
-            nodes = [ ]
-
-        length_to_go = length - (len(self.sequence) - start)
         yield self.sequence[start:start + length]
 
-        while nodes and length_to_go:
-            node = nodes.pop()
-            for sequence in node:
-                if len(sequence) <= length_to_go:
-                    yield sequence
-                    length_to_go -= len(sequence)
-                else:
-                    yield sequence[:length_to_go]
-                    length_to_go = 0
+        length_to_go = length - len(self.sequence) + start
+        if length_to_go <= 0:
+            return
 
-                if length_to_go == 0:
-                    break
+        while nodes:
+            for sequence in nodes.pop():
+                length_to_go -= len(sequence)
+                if length_to_go > 0:
+                    yield sequence
+                else:
+                    yield sequence[:length_to_go] if length_to_go else sequence
+                    return
 
     def __repr__(self):
         return f'{type(self).__name__}(sequence={self.sequence!r})'
