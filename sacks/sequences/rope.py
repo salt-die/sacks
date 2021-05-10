@@ -143,7 +143,8 @@ class Rope(MutableSequence):
 
         if self.type is str:
             return "".join(self._root.slice(start, length))
-        return sum(self._root.slice(start, length))
+
+        return sum(self._root.slice(start, length), self.type())
 
     def __setitem__(self, key, sequence):
         first_split, second_split = self._normalize_index(key)
@@ -155,8 +156,6 @@ class Rope(MutableSequence):
         self.join(end)
         self.collapse()
 
-        self._len -= second_split + len(sequence)
-
     def __delitem__(self, key):
         first_split, second_split = self._normalize_index(key)
 
@@ -165,8 +164,6 @@ class Rope(MutableSequence):
 
         self.join(end)
         self.collapse()
-
-        self._len -= second_split
 
     def __add__(self, other):
         if self.type != other.type:
@@ -180,14 +177,12 @@ class Rope(MutableSequence):
 
     def __iadd__(self, other):
         self.join(other.copy())
-        self._len += len(other)
         return self
 
     def append(self, sequence):
         """Append the sequence to the end of the rope.
         """
         self.join(Rope(sequence, leafsize=self.leafsize))
-        self._len += len(sequence)
 
     def join(self, other):
         """
@@ -243,8 +238,6 @@ class Rope(MutableSequence):
         _, end = self.split(index)
         self.join(Rope(sequence, leafsize=self.leafsize))
         self.join(end)
-
-        self._len += len(sequence)
 
     def split(self, index):
         """Split the rope at `index`.  Return both ends of split.
