@@ -1,5 +1,6 @@
 from collections.abc import Collection, Reversible
 
+
 class TwoStackQueue(Collection, Reversible):
     """
     A queue implemented with two stacks.
