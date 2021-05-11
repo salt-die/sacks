@@ -4,6 +4,7 @@ An odd collection of odd collections!
 
 * iterables
     * DoublyLinkedList - A doubly-linked list implementation for use with higher-order collections.
+    * TwoStackQueue - A queue implemented with two stacks.
 * iterators
     * Peek - An iterator-wrapper that allows one to peek at the next items without consuming them.
 * mappings
