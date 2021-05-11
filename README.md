@@ -7,6 +7,7 @@ An odd collection of odd collections!
     * TwoStackQueue - A queue implemented with two stacks.
 * iterators
     * Peek - An iterator-wrapper that allows one to peek at the next items without consuming them.
+    * RingBuffer - A FIFO buffer with a fixed size.
 * mappings
     * AdaptiveRadixTree - A memory-efficient trie in which each node that is the only child is merged with its parent.
     * Bijection - A one-to-one mapping. `reverse` method allows reverse-lookup.
@@ -18,7 +19,6 @@ An odd collection of odd collections!
 * sequences
     * IndexedSet - An indexable set.
     * Necklace - An immutable sequence that "wraps-around".
-    * RingBuffer - A FIFO buffer with a fixed size.
     * Rope - A binary-tree that allows efficient manipulation of variable-length types.
     * View - A mutable view of a sequence.
 * sets

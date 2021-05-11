@@ -11,13 +11,14 @@ class RingBuffer(Iterator, Sized):
         self._buffer = [None] * size
         self._len = 0
         self._head = 0
+        self.write_from(iterable)
 
     def __len__(self):
         return self._len
 
     def read(self):
         """
-        Returns the next item.
+        Read the next item.
 
         Raises
         ------
@@ -35,7 +36,7 @@ class RingBuffer(Iterator, Sized):
 
     def write(self, item):
         """
-        Add `item` to the buffer.
+        Write the `item` to the buffer.
 
         Raises
         ------
