@@ -10,6 +10,7 @@ class DoublyLinkedList(Container, Reversible):
     Notes
     -----
     Appends return the underlying block primitives for structures that may want access to them.
+
     """
     __slots__ = 'root',
 
