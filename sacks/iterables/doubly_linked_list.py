@@ -66,26 +66,29 @@ class DoublyLinkedList(Container, Reversible):
         """Destructively merge another linked list into this one.
         """
         root = other.root
+
         if root.next is root:
             return
 
-        first = root.next
-        last = root.prev
+        # Start of `other` place after end of this list...
+        root.next.prev = self.root.prev
+        root.next.insert()
 
-        first.prev = self.root.prev
-        first.insert()
+        # ...and end of `other` placed before sentinel.
+        root.prev.next = self.root
+        root.prev.insert()
 
-        last.next = self.root
-        last.insert()
-
+        # Reset `other`'s root.
         root.prev = root.next = root
 
     def rotate(self):
         """Rotate this deque 1 step to the right.
         """
         root = self.root
+
         root.remove()
-        root.next, root.prev = root.prev, root.prev.prev
+        root.next = root.prev
+        root.prev = root.prev.prev
         root.insert()
 
     def __repr__(self):
