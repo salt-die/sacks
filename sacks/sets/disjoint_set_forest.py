@@ -15,6 +15,7 @@ class DisjointSetForest(Iterable, Sized):
     -----
     `union` and `find` operations are amortized O(α(n)) with n sets where α(n) is the inverse Ackermann function.
     This data structure is famously used for Kruskal's algorithm for finding minimum spanning trees.
+
     """
     def __init__(self, n=0):
         self.parents = list(range(n))
