@@ -50,7 +50,7 @@ class TwoStackQueue(Collection, Reversible):
 
     def extend(self, iterable):
         for item in iterable:
-            self.push(item)
+            self.append(item)
 
     def __repr__(self):
         return f'{type(self).__name__}([{", ".join(map(repr, self))}])'
