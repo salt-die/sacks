@@ -35,7 +35,7 @@ class DisjointSetForest(Sized, Iterable):
         """Add `n` more disjoint sets to the forest.
         """
         self.parents.extend(range(len(self), len(self) + n))
-        self.ranks.extend([0] * n)
+        self.ranks.extend(0 for _ in range(n))
 
     def find(self, i):
         """Return the representative member of set `i`.
