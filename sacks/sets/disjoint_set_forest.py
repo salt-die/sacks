@@ -1,8 +1,8 @@
-from collections.abc import Sized, Iterable
+from collections.abc import Iterable, Sized
 from collections import defaultdict
 
 
-class DisjointSetForest(Sized, Iterable):
+class DisjointSetForest(Iterable, Sized):
     """
     A collection of disjoint sets with very fast `union` and `find` operations.
 
