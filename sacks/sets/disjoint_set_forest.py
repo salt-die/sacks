@@ -27,7 +27,7 @@ class DisjointSetForest(Sized, Iterable):
     def __len__(self):
         """The number of disjoint sets.
         """
-        return len(set(parents))
+        return len(set(self.parents))
 
     def __iter__(self):
         """Yield each disjoint set as a list of its members.
