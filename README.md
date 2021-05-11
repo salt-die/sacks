@@ -22,5 +22,6 @@ An odd collection of odd collections!
     * View - A mutable view of a sequence.
 * sets
     * BloomFilter - A memory-efficient data structure with probabalistic membership checks.  (requires `bitarray`)
+    * DisjointSetForest - A collection of disjoint sets with very fast `union` and `find` operations.
     * OrderedSet - An ordered set.
     * Setch - Set with choice. Exposes a sequence of the items of the set, `as_sequence`, for use with `random` module.
