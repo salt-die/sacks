@@ -22,6 +22,8 @@ class DisjointSetForest(Sized, Iterable):
 
     @property
     def size(self):
+        """The number of (not necessarily disjoint) sets.
+        """
         return len(self.parents)
 
     def __len__(self):
