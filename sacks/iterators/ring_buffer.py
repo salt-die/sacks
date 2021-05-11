@@ -36,7 +36,7 @@ class RingBuffer(Iterator, Sized):
 
     def write(self, item):
         """
-        Write the `item` to the buffer.
+        Write `item` to the buffer.
 
         Raises
         ------
