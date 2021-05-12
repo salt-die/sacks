@@ -36,6 +36,9 @@ class DoublyLinkedList(Container, Reversible):
                 return True
         return False
 
+    def __bool__(self):
+        return self.root is not self.root.next
+
     def append(self, val):
         return Block(val, prev=self.root.prev, next=self.root)
 
@@ -51,35 +54,16 @@ class DoublyLinkedList(Container, Reversible):
             self.appendleft(item)
 
     def pop(self):
-        if self.root.prev is self.root:
+        if not self:
             raise IndexError('pop from empty list')
 
         return self.root.prev.pop()
 
     def popleft(self):
-        if self.root.next is self.root:
+        if not self:
             raise IndexError('pop from empty list')
 
         return self.root.next.pop()
-
-    def merge(self, other):
-        """Destructively merge another linked list into this one.
-        """
-        root = other.root
-
-        if root.next is root:
-            return
-
-        # Start of `other` place after end of this list...
-        root.next.prev = self.root.prev
-        root.next.insert()
-
-        # ...and end of `other` placed before sentinel.
-        root.prev.next = self.root
-        root.prev.insert()
-
-        # Reset `other`'s root.
-        root.prev = root.next = root
 
     def rotate(self):
         """Rotate this deque 1 step to the right.
@@ -90,6 +74,9 @@ class DoublyLinkedList(Container, Reversible):
         root.next = root.prev
         root.prev = root.prev.prev
         root.insert()
+
+    def __del__(self):
+        self.root.pop()  # Remove root's circular reference
 
     def __repr__(self):
         return f'{type(self).__name__}({", ".join(repr(item) for item in self)})'
