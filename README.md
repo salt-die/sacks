@@ -2,6 +2,8 @@
 
 An odd collection of odd collections!
 
+* heaps
+    * FibonacciHeap - A priority queue consisting of heap-ordered trees.
 * iterables
     * DoublyLinkedList - A doubly-linked list implementation for use with higher-order collections.
     * TwoStackQueue - A queue implemented with two stacks.

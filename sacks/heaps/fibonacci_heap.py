@@ -66,6 +66,8 @@ class Entry:
 
 
 class FibonacciHeap(Heap):
+    """A priority queue consisting of heap-ordered trees.
+    """
     def __init__(self):
         self.min_root = None
         self._size = 0
