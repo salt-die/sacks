@@ -1,7 +1,5 @@
 from .block import Block
-from ._sentinel import sentinel
-
-EMPTY = sentinel('NoNode', repr='EMPTY', methods={ 'link': lambda self, other: other })
+from ._tree_printer import tree_printer
 
 
 class FibHeapNode(Block):
@@ -13,31 +11,37 @@ class FibHeapNode(Block):
         super().__init__(value)
 
         self.parent = None
-        self.children = EMPTY
+        self.children = None
         self.degree = 0
         self.marked = False
 
     @property
     def is_root(self):
-        return bool(self.parent)
+        return self.parent is None
 
     def __lt__(self, other):
         return self.value < other.value
 
     def add_child(self, child):
+        child.remove()
         child.parent = self
         self.degree += 1
-        self.children.link_before(child)
 
-    def link_before(self, other):
-        """Link before other.
-        """
-        other.remove()
-        other.next = self.next
-        other.prev = self
-        other.insert()
+        if self.children:
+            child.next = self.children
+            child.prev = self.children.prev
+            child.insert()
+        else:
+            self.children = child
+            child.prev = child.next = child
 
     def __iter__(self):
-        yield current := self
+        yield (current := self)
         while (current := current.next) is not self:
             yield current
+
+    def __repr__(self):
+        return f'{type(self).__name__}({self.value!r})'
+
+    def __str__(self):
+        return '\n'.join(tree_printer(repr(self.value), self.children or ()))
