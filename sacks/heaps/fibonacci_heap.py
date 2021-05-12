@@ -1,3 +1,4 @@
+from .heap import Heap
 from ..primitives import FibHeapNode
 
 INF = float('inf')
@@ -58,7 +59,7 @@ class Entry:
         self._heap.delete(self._node)
 
 
-class FibonacciHeap:
+class FibonacciHeap(Heap):
     def __init__(self):
         self.min_root = None
         self._size = 0
