@@ -23,6 +23,7 @@ class RingBuffer(Iterator, Sized):
         Raises
         ------
         StopIteration if buffer is empty.
+
         """
         if self._len == 0:
             raise StopIteration("buffer empty")
@@ -41,6 +42,7 @@ class RingBuffer(Iterator, Sized):
         Raises
         ------
         MemoryError if buffer is full.
+
         """
         if self._len == len(self._buffer):
             raise MemoryError("buffer full")
@@ -51,8 +53,7 @@ class RingBuffer(Iterator, Sized):
         return self._len
 
     def write_from(self, iterable):
-        """
-        Writes each item of `iterable`.
+        """Writes each item of `iterable`.
         """
         for item in iterable:
             self.write(item)
