@@ -79,4 +79,4 @@ class DoublyLinkedList(Container, Reversible):
         self.root.pop()  # Remove root's circular reference
 
     def __repr__(self):
-        return f'{type(self).__name__}({", ".join(repr(item) for item in self)})'
+        return f'{type(self).__name__}([{", ".join(repr(item) for item in self)}])'
