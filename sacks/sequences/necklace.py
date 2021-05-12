@@ -21,6 +21,7 @@ class Necklace(Sequence):
     (2, 0, 2, 0, 2, 0, 2, 0, 2)
     ```
     Note that despite equality of `n` and `m`, their indexing won't be equal.
+
     """
     __slots__ = '_items', 'least_shift', 'aperiodic',
 

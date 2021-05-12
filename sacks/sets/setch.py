@@ -8,6 +8,7 @@ class Setch(MutableSet):
     Exposes a sequence of the items of the set, `as_sequence`, that one can use with the
     `random` module's `choice`, `choices`, and `sample` functions. This sequence is efficiently
     maintained (though order is not maintained) as the set is mutated.
+
     """
     __slots__ = '_item_map', 'as_sequence',
 
