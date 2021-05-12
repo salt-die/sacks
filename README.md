@@ -16,6 +16,7 @@ An odd collection of odd collections!
     * Dictch - Dict with choice. Exposes a sequence of the keys of the mapping, `as_sequence`, for use with `random` module.
 * primitives
     * Block - Element of a doubly-linked list.
+    * FibHeapNode - Primitive of a Fibonacci Heap.  A combination of a tree node and `Block`.
     * RadixNode - A node of an Adaptive Radix Tree.
     * RopeInternal, RopeLeaf - Nodes of a Rope.
 * sequences
