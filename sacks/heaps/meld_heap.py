@@ -33,6 +33,8 @@ class MeldableHeap(Heap):
     [https://en.wikipedia.org/wiki/Randomized_meldable_heap]
 
     """
+    __slots__ = 'root',
+
     def __init__(self):
         self.root = None
         self._size = 0
