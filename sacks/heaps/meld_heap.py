@@ -47,11 +47,10 @@ class MeldableHeap(Heap):
 
         self._size -= 1
 
-        result = self.root.value
-
-        self.root = meld(self.root.left, self.root.right)
-
-        return result
+        try:
+            return self.root.value
+        finally:
+            self.root = meld(self.root.left, self.root.right)
 
     def __repr__(self):
         return f'{type(self).__name__}[size={self._size}]'

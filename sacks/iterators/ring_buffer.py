@@ -28,9 +28,10 @@ class RingBuffer(Iterator, Sized):
         if self._len == 0:
             raise StopIteration("buffer empty")
 
-        self._len -= 1
-
-        return self._buffer[self._head - self._len + 1]
+        try:
+            return self._buffer[self._head - self._len]
+        finally:
+            self._len -= 1
 
     __next__ = read
 
