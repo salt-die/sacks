@@ -11,7 +11,7 @@ def meld(a, b):
         return b
 
     if b is None:
-        return b
+        return a
 
     if a > b:
         a, b = b, a
@@ -47,11 +47,11 @@ class MeldableHeap(Heap):
 
         self._size -= 1
 
-        try:
-            return self.root.value
+        result = self.root.value
 
-        finally:
-            self.root = meld(self.root.left, self.root.right)
+        self.root = meld(self.root.left, self.root.right)
+
+        return result
 
     def __repr__(self):
         return f'{type(self).__name__}[size={self._size}]'
