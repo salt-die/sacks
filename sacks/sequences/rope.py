@@ -172,8 +172,8 @@ class Rope(MutableSequence):
 
         new_rope = Rope(leafsize=max(self.leafsize, other.leafsize), type=self.type)
         new_rope._root = self._root.copy()
+        new_rope._len = len(self)
         new_rope += other
-        new_rope._len = len(self) + len(other)
         return new_rope
 
     def __iadd__(self, other):
