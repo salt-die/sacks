@@ -27,30 +27,30 @@ class Rope(MutableSequence):
     __slots__ = '_root', 'leafsize', 'type', '_len',
 
     def __init__(self, sequence='', *, leafsize=8, type=None):
-        self._root = RopeInternal()
         self.leafsize = leafsize
         self.type = type or __builtins__['type'](sequence)
         self._len = len(sequence)
 
-        if sequence:
-            self._from_sequence(sequence, self._root)
-            self.collapse()
+        self._root = self._from_sequence(sequence)
+        self.collapse()
 
     @property
     def root(self):
         return self._root
 
-    def _from_sequence(self, sequence, root):
-        size = len(sequence)
+    def _from_sequence(self, sequence):
+        half = len(sequence) // 2
 
-        if size <= self.leafsize * 2:
-            root.left = RopeLeaf(sequence[:size//2])
-            root.right = RopeLeaf(sequence[size//2:])
-        else:
-            root.left = RopeInternal()
-            root.right = RopeInternal()
-            self._from_sequence(sequence[:size//2], root.left)
-            self._from_sequence(sequence[size//2:], root.right)
+        if half <= self.leafsize:
+            return RopeInternal(
+                RopeLeaf( sequence[:half] ),
+                RopeLeaf( sequence[half:] ),
+            )
+
+        return RopeInternal(
+            self._from_sequence( sequence[:half] ),
+            self._from_sequence( sequence[half:] ),
+        )
 
     def __len__(self):
         return self._len
@@ -80,7 +80,7 @@ class Rope(MutableSequence):
         return copy
 
     def collapse(self):
-        """Remove all non-internal 0 weight nodes.
+        """Remove all 0 weight leaf nodes.
         """
         self._root.collapse()
 
