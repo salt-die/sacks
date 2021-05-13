@@ -4,12 +4,10 @@ from ..primitives import FibHeapNode
 def merge_lists(a, b):
     """Merge two linked lists and return the least node.
     """
-    if not a:
-        if not b:
-            return None
+    if a is None:
         return b
 
-    if not b:
+    if b is None:
         return a
 
     prev = b.prev
@@ -66,14 +64,17 @@ class Entry:
 
 
 class FibonacciHeap(Heap):
-    """A priority queue consisting of heap-ordered trees.
+    """
+    A priority queue consisting of heap-ordered trees.
+
+    References
+    ----------
+    [https://en.wikipedia.org/wiki/Fibonacci_heap]
+
     """
     def __init__(self):
         self.min_root = None
         self._size = 0
-
-    def __len__(self):
-        return self._size
 
     def heappush(self, value):
         node = FibHeapNode(value)
@@ -127,7 +128,7 @@ class FibonacciHeap(Heap):
         self.heappop()
 
     def __repr__(self):
-        return f'{type(self).__name__}[min={self.min_root.value!r}, size={self._size}]'
+        return f'{type(self).__name__}[size={self._size}]'
 
     def __str__(self):
         return '\n'.join(map(str, self.min_root))
