@@ -36,6 +36,10 @@ class Rope(MutableSequence):
             self._from_sequence(sequence, self._root)
             self.collapse()
 
+    @property
+    def root(self):
+        return self._root
+
     def _from_sequence(self, sequence, root):
         size = len(sequence)
 
