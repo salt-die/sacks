@@ -4,57 +4,6 @@ from ._sentinel import sentinel
 from ._tree_printer import tree_printer
 
 
-class Strand(ABC):
-    """A channel between a node and its parent.
-    """
-    __slots__ = 'parent',
-
-    def __init__(self, parent):
-        self.parent = parent
-
-    @abstractmethod
-    def cut(self):
-        """Remove parent's reference to a child.
-        """
-        pass
-
-    @abstractmethod
-    def dispatch_weight(self, delta):
-        pass
-
-    @abstractmethod
-    def attach(self, child):
-        """Replace owner of this strand with `child` as `self.parent`'s child.
-        """
-        pass
-
-
-class LeftStrand(Strand):
-    def cut(self):
-        self.dispatch_weight(-sum(map(len, self.parent.left)))
-        self.parent._left._strand = DANGLING
-        self.parent._left = EMPTY
-
-    def dispatch_weight(self, delta):
-        self.parent.weight += delta
-
-    def attach(self, child):
-        self.parent.left = child
-
-
-class RightStrand(Strand):
-    def cut(self):
-        self.dispatch_weight(-sum(map(len, self.parent.right)))
-        self.parent._right._strand = DANGLING
-        self.parent._right = EMPTY
-
-    def dispatch_weight(self, delta):
-        self.parent.strand.dispatch_weight(delta)
-
-    def attach(self, child):
-        self.parent.right = child
-
-
 class RopeNode(ABC):
     """The base primitive of a Rope.
     """
@@ -118,6 +67,58 @@ class RopeNode(ABC):
         """Yield sequences starting at index `start` until the sum of their lengths reaches `length`.
         """
         pass
+
+
+class Strand(ABC):
+    """A channel between a node and its parent.
+    """
+    __slots__ = 'parent',
+
+    def __init__(self, parent):
+        self.parent = parent
+
+    @abstractmethod
+    def cut(self):
+        """Remove parent's reference to a child.
+        """
+        pass
+
+    @abstractmethod
+    def dispatch_weight(self, delta):
+        pass
+
+    @abstractmethod
+    def attach(self, child):
+        """Replace owner of this strand with `child` as `self.parent`'s child.
+        """
+        pass
+
+
+class LeftStrand(Strand):
+    def cut(self):
+        self.dispatch_weight(-sum(map(len, self.parent.left)))
+        self.parent._left._strand = DANGLING
+        self.parent._left = EMPTY
+
+    def dispatch_weight(self, delta):
+        self.parent.weight += delta
+
+    def attach(self, child):
+        self.parent.left = child
+
+
+class RightStrand(Strand):
+    def cut(self):
+        self.dispatch_weight(-sum(map(len, self.parent.right)))
+        self.parent._right._strand = DANGLING
+        self.parent._right = EMPTY
+
+    def dispatch_weight(self, delta):
+        self.parent.strand.dispatch_weight(delta)
+
+    def attach(self, child):
+        self.parent.right = child
+
 
 # Sentinel objects for missing leaves and half-strands respectively.
 EMPTY = sentinel(
