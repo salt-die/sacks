@@ -41,7 +41,8 @@ def merge_trees(trees):
 class Entry:
     """An interface for decreasing/deleting a key in a Fibonacci heap. (Tree nodes will stay private.)
     """
-    __slots__ = '_node', '_heap'
+    __slots__ = '_node', '_heap',
+
     def __init__(self, node, heap):
         self._node = node
         self._heap = heap
@@ -72,6 +73,8 @@ class FibonacciHeap(Heap):
     [https://en.wikipedia.org/wiki/Fibonacci_heap]
 
     """
+    __slots__ = 'min_root',
+
     def __init__(self):
         self.min_root = None
         self._size = 0
