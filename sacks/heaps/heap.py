@@ -3,6 +3,7 @@ from collections.abc import Sized
 
 
 class Heap(ABC, Sized):
+    __slots__ = '_size',
 
     def __len__(self):
         return self._size
