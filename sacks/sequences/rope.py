@@ -72,6 +72,7 @@ class Rope(MutableSequence):
         """
         copy = Rope(leafsize=self.leafsize, type=self.type)
         copy._root = self._root.copy()
+        copy._len = self._len
         return copy
 
     def collapse(self):
