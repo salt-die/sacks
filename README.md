@@ -18,13 +18,15 @@ An odd collection of odd collections!
 * primitives
     * BinaryNode - Primitive of a binary tree.
     * Block - Element of a doubly-linked list.
-    * FibHeapNode - Primitive of a Fibonacci Heap.  A combination of a tree node and `Block`.
-    * RadixNode - A node of an Adaptive Radix Tree.
+    * FibHeapNode - Primitive of a Fibonacci heap.  A combination of a tree node and `Block`.
+    * RadixNode - A node of an adaptive radix tree.
     * RopeInternal, RopeLeaf - Nodes of a Rope.
+    * SkipListBlock - Singly-linked block of a skip list.
 * sequences
     * IndexedSet - An indexable set.
     * Necklace - An immutable sequence that "wraps-around".
     * Rope - A binary-tree that allows efficient manipulation of variable-length types.
+    * SkipList - An ordered sequence with O(log n) search and insertion. *unfinished*
     * View - A mutable view of a sequence.
 * sets
     * BloomFilter - A memory-efficient data structure with probabalistic membership checks.  (requires `bitarray`)
