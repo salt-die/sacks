@@ -4,14 +4,16 @@ from ._tree_printer import tree_printer
 class SkipListBlock:
     """Primitive of a Skip List.  Each block is singly-linked to several other blocks.
     """
-    __slots__ = 'value', 'height', 'forwards', 'weights',
+    __slots__ = 'value', 'forwards', 'skip',
 
-    def __init__(self, value, height):
+    def __init__(self, value):
         self.value = value
-        self.height = height
-
         self.forwards = [ ]
-        self.weights = [ ]
+        self.skip = 1
+
+    @property
+    def height(self):
+        return len(self.forwards)
 
     def __lt__(self, other):
         return self.value < other.value
@@ -21,4 +23,3 @@ class SkipListBlock:
 
     def __str__(self):
         return '\n'.join(tree_printer(repr(self), list(map(repr, self.forwards))))
-
