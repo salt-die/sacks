@@ -9,11 +9,10 @@ class SkipListBlock:
     def __init__(self, value):
         self.value = value
         self.forwards = [ ]
-        self.skip = 1
 
     @property
     def height(self):
-        return len(self.forwards)
+        return len(self.forwards) - 1
 
     def __lt__(self, other):
         return self.value < other.value
@@ -23,3 +22,4 @@ class SkipListBlock:
 
     def __str__(self):
         return '\n'.join(tree_printer(repr(self), list(map(repr, self.forwards))))
+
