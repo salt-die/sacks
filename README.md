@@ -26,7 +26,7 @@ An odd collection of odd collections!
     * IndexedSet - An indexable set.
     * Necklace - An immutable sequence that "wraps-around".
     * Rope - A binary-tree that allows efficient manipulation of variable-length types.
-    * SkipList - An ordered sequence with O(log n) search and insertion. *unfinished*
+    * SkipList - An ordered (and indexable) sequence with O(log n) search and insertion.
     * View - A mutable view of a sequence.
 * sets
     * BloomFilter - A memory-efficient data structure with probabalistic membership checks.  (requires `bitarray`)
