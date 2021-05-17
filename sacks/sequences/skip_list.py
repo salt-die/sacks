@@ -27,6 +27,8 @@ class SkipList(MutableSet):
         self._head = SkipListBlock(object(), [ TAIL ], [ 1 ])
         self.p = p
 
+        self.update(iterable)
+
     @property
     def max_level(self):
         return len(self._head.forward_links)
@@ -81,7 +83,7 @@ class SkipList(MutableSet):
 
         Notes
         -----
-        Levels are added `self._head` if the random level is greater than current max level.
+        New levels are added as needed to accommodate too-large random levels.
 
         """
         level = 1
@@ -135,6 +137,13 @@ class SkipList(MutableSet):
             path[level].skips[level] += 1
 
         self._len += 1
+
+    def update(self, *iterables):
+        """Add each element in each iterable.
+        """
+        for iterable in iterables:
+            for item in iterable:
+                self.add(item)
 
     def remove(self, item):
         # Create a path through to block that contains item.
