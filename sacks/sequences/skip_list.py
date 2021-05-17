@@ -185,7 +185,7 @@ class SkipList(MutableSet):
     def __repr__(self):
         return f'{type(self).__name__}([{", ".join(map(repr, self))}], p={self.p})'
 
-    def _iter_blocks(self, level):
+    def _str_helper(self, level):
         SPACING = 5
 
         yield f'HEAD{"-" * (SPACING + 2) * (self._head.skips[level] - 1)}->'
@@ -198,4 +198,4 @@ class SkipList(MutableSet):
         yield f'TAIL'
 
     def __str__(self):
-        return '\n'.join(''.join(self._iter_blocks(level)) for level in reversed(range(self.max_level)))
+        return '\n'.join(''.join(self._str_helper(level)) for level in reversed(range(self.max_level)))
