@@ -1,5 +1,4 @@
 from collections.abc import MutableSet
-from itertools import islice
 from random import random
 
 from ..primitives import SkipListBlock
@@ -19,6 +18,7 @@ class SkipList(MutableSet):
     ----------
     p:
         Probability a block is linked on the next level. (default: .5)
+
     """
     __slots__ = '_len', 'p', '_head',
 
