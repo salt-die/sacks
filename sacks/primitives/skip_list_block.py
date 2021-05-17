@@ -12,8 +12,24 @@ class SkipListBlock:
     def max_level(self):
         return len(self.forward_links)
 
+    # Compare methods are overloaded - compares directly to value for non-blocks
+    def __lt__(self, other):
+        if isinstance(other, SkipListBlock):
+            return self.value < other.value
+
+        return self.value < other
+
     def __le__(self, other):
-        return self.value <= other.value
+        if isinstance(other, SkipListBlock):
+            return self.value <= other.value
+
+        return self.value < other
+
+    def __eq__(self, other):
+        if isinstance(other, SkipListBlock):
+            return self.value == other.value
+
+        return self.value == other
 
     def __repr__(self):
         return f'{type(self).__name__}(value={self.value})'
