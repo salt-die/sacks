@@ -104,7 +104,7 @@ class SkipList(MutableSet):
             while (next_block := current.forward_links[level]) < item:
                 current = next_block
 
-        return current == item
+        return current.forward_links[0] == item
 
     def add(self, item):
         random_level = self._random_level()
