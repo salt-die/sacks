@@ -125,7 +125,7 @@ class Rope(MutableSequence):
         """Common functionality for parsing slices for __getitem__, __setitem__, and __delitem__.
         """
         if isinstance(index, int):
-            if index < -len(self) or index > len(self):
+            if index < -len(self) or index >= len(self):
                 raise IndexError(f'index {index} out of range')
 
             if index < 0:
