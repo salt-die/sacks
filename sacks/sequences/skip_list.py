@@ -192,7 +192,7 @@ class SkipList(MutableSet):
 
         current = self._head.forward_links[level]
         while current is not TAIL:
-            yield f'{current.value!r:^{SPACING}}{"-" * (SPACING + 2) * (current.skips[level] - 1)}->'
+            yield f'{repr(current.value)[:SPACING]:^{SPACING}}{"-" * (SPACING + 2) * (current.skips[level] - 1)}->'
             current = current.forward_links[level]
 
         yield f'TAIL'
