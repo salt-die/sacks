@@ -39,7 +39,7 @@ class Rope(MutableSequence):
         return self._root
 
     def _from_sequence(self, sequence):
-        half = len(sequence) // 2
+        half = sum(divmod(len(sequence), 2))
 
         if half <= self.leafsize:
             return RopeInternal(
