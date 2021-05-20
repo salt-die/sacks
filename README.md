@@ -32,4 +32,5 @@ An odd collection of odd collections!
     * BloomFilter - A memory-efficient data structure with probabalistic membership checks.  (requires `bitarray`)
     * DisjointSetForest (or UnionFind) - A collection of disjoint sets with very fast `union` and `find` operations.
     * OrderedSet - An ordered set.
+    * RefinementPartition - A collection of disjoint subsets with very fast refinement.  The dual of UnionFind.
     * Setch - Set with choice. Exposes a sequence of the items of the set, `as_sequence`, for use with `random` module.
