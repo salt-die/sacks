@@ -33,11 +33,11 @@ class DisjointSetForest(Iterable, Sized):
         return len(set(self.parents))
 
     def __iter__(self):
-        """Yield each disjoint set as a list of its members.
+        """Yield each disjoint set.
         """
-        sets = defaultdict(list)
+        sets = defaultdict(set)
         for i in range(self.size):
-            sets[self.find(i)].append(i)
+            sets[self.find(i)].add(i)
         yield from sets.values()
 
     def makeset(self, n=1):
@@ -83,8 +83,5 @@ class DisjointSetForest(Iterable, Sized):
         return self.find(i) != self.find(j)
 
     def __repr__(self):
-        return f'{type(self).__name__}(n={self.size})'
-
-    def __str__(self):
         as_strings = (f'({", ".join(map(str, group))})' for group in self)
         return f'{{{", ".join(as_strings)}}}'
