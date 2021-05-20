@@ -41,7 +41,7 @@ class PartitionRefinement(Iterable, Sized):
         self._partition.pop(item).remove(item)
 
     def refine(self, S):
-        """Refine each set, A, in the partition into A & S and A - S. Return a list of pairs (A & S, A -S).
+        """Refine each set, A, in the partition into A & S and A - S. Return a list of pairs (A & S, A - S).
         """
         intersections = defaultdict(set)
         for item in S:
@@ -56,6 +56,8 @@ class PartitionRefinement(Iterable, Sized):
                 for item in AS:
                     self._partition[item] = AS
                 A -= AS
+                refined_sets.append((A, AS))
+        return refined_sets
 
     def __repr__(self):
         return f'{{{", ".join(repr(subset) for subset in self)}}}'
