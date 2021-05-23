@@ -1,5 +1,7 @@
 from collections.abc import Iterator, Sized
 
+NO_DEFAULT = object()
+
 
 class RingBuffer(Iterator, Sized):
     """A FIFO buffer with a fixed size. [https://en.wikipedia.org/wiki/Circular_buffer]
@@ -8,17 +10,30 @@ class RingBuffer(Iterator, Sized):
 
     def __init__(self, size, iterable=()):
         self.size = size
-        self._buffer = [None] * size
+        self._buffer = [ None ] * size
         self._len = 0
         self._head = 0
-        self.write_from(iterable)
+        self.extend(iterable)
 
     def __len__(self):
         return self._len
 
-    def read(self):
+    def peek(self, default=NO_DEFAULT):
         """
-        Read the next item.
+        Return the next item without consuming it.  If default is provided and buffer
+        is empty return default else raise StopIteration.
+        """
+
+        if len(self) == 0:
+            if default is NO_DEFAULT:
+                raise StopIteration('buffer empty')
+            return default
+
+        return self._buffer[self._head - self._len]
+
+    def popleft(self):
+        """
+        Return the next item.
 
         Raises
         ------
@@ -26,18 +41,18 @@ class RingBuffer(Iterator, Sized):
 
         """
         if self._len == 0:
-            raise StopIteration("buffer empty")
+            raise StopIteration('buffer empty')
 
         try:
             return self._buffer[self._head - self._len]
         finally:
             self._len -= 1
 
-    __next__ = read
+    __next__ = popleft
 
-    def write(self, item):
+    def append(self, item):
         """
-        Write `item` to the buffer.
+        Append `item` to the buffer.
 
         Raises
         ------
@@ -45,19 +60,17 @@ class RingBuffer(Iterator, Sized):
 
         """
         if self._len == len(self._buffer):
-            raise MemoryError("buffer full")
+            raise MemoryError('buffer full')
 
         self._buffer[self._head] = item
         self._head = (self._head + 1) % self.size
         self._len += 1
-        return self._len
 
-    def write_from(self, iterable):
-        """Writes each item of `iterable`.
+    def extend(self, iterable):
+        """Append each item of `iterable`.
         """
         for item in iterable:
-            self.write(item)
-        return self._len
+            self.append(item)
 
     def __repr__(self):
         len_ = len(self)
