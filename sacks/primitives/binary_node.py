@@ -4,7 +4,7 @@ from ._tree_printer import tree_printer
 class BinaryNode:
     """Primitive of a binary tree.
     """
-    __slots__ = 'value', 'left', 'right', 'parent',
+    __slots__ = 'value', 'left', 'right',
 
     def __init__(self, value, left=None, right=None):
         self.value = value
