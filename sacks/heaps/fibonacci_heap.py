@@ -1,4 +1,4 @@
-from .heap import Heap
+from .heap import Heap, Entry
 from ..primitives import FibHeapNode
 
 def merge_lists(a, b):
@@ -38,32 +38,6 @@ def merge_trees(trees):
     return min(root)
 
 
-class Entry:
-    """An interface for decreasing/deleting a key in a Fibonacci heap. (Tree nodes will stay private.)
-    """
-    __slots__ = '_node', '_heap',
-
-    def __init__(self, node, heap):
-        self._node = node
-        self._heap = heap
-
-    @property
-    def value(self):
-        return self._node.value
-
-    def decrease_key(self, value):
-        if value >= self.value:
-            raise ValueError(f'{value} greater than {self.value}')
-
-        self._heap.decrease_key(self._node, value)
-
-    def delete(self):
-        self._heap.delete(self._node)
-
-    def __repr__(self):
-        return f'{type(self).__name__}({self.value!r})'
-
-
 class FibonacciHeap(Heap):
     """
     A priority queue consisting of heap-ordered trees.
@@ -73,15 +47,13 @@ class FibonacciHeap(Heap):
     [https://en.wikipedia.org/wiki/Fibonacci_heap]
 
     """
-    __slots__ = 'min_root',
-
     def __init__(self):
-        self.min_root = None
+        self.root = None
         self._size = 0
 
     def heappush(self, value):
         node = FibHeapNode(value)
-        self.min_root = merge_lists(self.min_root, node)
+        self.root = merge_lists(self.root, node)
         self._size += 1
         return Entry(node, self)
 
@@ -89,22 +61,22 @@ class FibonacciHeap(Heap):
         if not self:
             raise IndexError('pop from empty heap')
 
-        if self.min_root.next is self.min_root:
+        if self.root.next is self.root:
             roots = None
         else:
-            roots = self.min_root.next
+            roots = self.root.next
 
-        result = self.min_root.pop()
+        result = self.root.pop()
 
         self._size -= 1
         if self._size == 0:
-            self.min_root = None
+            self.root = None
         else:
-            if children := self.min_root.children:
+            if children := self.root.children:
                 for root in children:
                     root.parent = None
 
-            self.min_root = merge_trees(merge_lists(roots, children))
+            self.root = merge_trees(merge_lists(roots, children))
 
         return result
 
@@ -124,14 +96,10 @@ class FibonacciHeap(Heap):
         node.marked = False
         node.parent = None
 
-        self.min_root = merge_lists(self.min_root, node)
-
-    def delete(self, node):
-        self.decrease_key(node, float('-inf'))
-        self.heappop()
+        self.root = merge_lists(self.root, node)
 
     def __repr__(self):
         return f'{type(self).__name__}[size={self._size}]'
 
     def __str__(self):
-        return '\n'.join(map(str, self.min_root))
+        return '\n'.join(map(str, self.root))
