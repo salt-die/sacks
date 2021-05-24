@@ -5,6 +5,7 @@ An odd collection of odd collections!
 * heaps
     * FibonacciHeap - A priority queue consisting of heap-ordered trees.
     * MeldableHeap - A heap-ordered binary tree with O(ln n) worst-case performance with small constant factors.
+    * PairingHeap - A simple heap-ordered tree with excellent practical performance.
 * iterables
     * DoublyLinkedList - A doubly-linked list implementation for use with higher-order collections.
     * TwoStackQueue - A queue implemented with two stacks.
@@ -15,13 +16,6 @@ An odd collection of odd collections!
     * AdaptiveRadixTree - A memory-efficient trie in which each node that is the only child is merged with its parent.
     * Bijection - A one-to-one mapping. `reverse` method allows reverse-lookup.
     * Dictch - Dict with choice. Exposes a sequence of the keys of the mapping, `as_sequence`, for use with `random` module.
-* primitives
-    * BinaryNode - Primitive of a binary tree.
-    * Block - Element of a doubly-linked list.
-    * FibHeapNode - Primitive of a Fibonacci heap.  A combination of a tree node and `Block`.
-    * RadixNode - A node of an adaptive radix tree.
-    * RopeInternal, RopeLeaf - Nodes of a Rope.
-    * SkipListBlock - Singly-linked block of a skip list.
 * sequences
     * IndexedSet - An indexable set.
     * Necklace - An immutable sequence that "wraps-around".
