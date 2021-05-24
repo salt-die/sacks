@@ -8,11 +8,10 @@ def snake(head, tail, text):
     yield head + first
     yield from (tail + line for line in rest)
 
-
 def tree_printer(root, children):
-    """Yields lines for a tree representation of the children.
+    """Pretty prints a tree.
     """
-    yield root
+    yield str(root)
 
     if not children:
         return
