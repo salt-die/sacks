@@ -3,7 +3,6 @@ from random import random
 from .heap import Heap
 from ..primitives import BinaryNode
 
-
 def meld(a, b):
     """Merge two trees into a single tree. Rough balancing achieved with a coin-flip.
     """
@@ -33,8 +32,6 @@ class MeldableHeap(Heap):
     [https://en.wikipedia.org/wiki/Randomized_meldable_heap]
 
     """
-    __slots__ = 'root',
-
     def __init__(self):
         self.root = None
         self._size = 0
