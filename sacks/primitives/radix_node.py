@@ -1,8 +1,9 @@
 from bisect import bisect_left
-from ._tree_printer import tree_printer
 
-# Sentinel / Indicates a node is not a key of the tree, but just a passing node.
-NOT_KEY = type('NOT_KEY', (), {'__repr__': lambda self: 'NOT_KEY'})()
+from ._tree_printer import tree_printer
+from . import sentinel
+
+NOT_KEY = sentinel(name='NotKey', repr='NOT_KEY')
 
 
 class RadixNode:

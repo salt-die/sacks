@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from collections.abc import Sized
 
-from ..primitives._sentinel import sentinel
+from ..primitives import sentinel
 
 NEG_INF = sentinel(
     name='NegInf',
@@ -11,6 +11,7 @@ NEG_INF = sentinel(
         '__gt__': lambda self, other: False,
     },
 )
+
 
 class Heap(ABC, Sized):
     __slots__ = '_size', 'root',

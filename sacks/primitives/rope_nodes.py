@@ -1,6 +1,6 @@
 from abc import abstractmethod, ABC
 
-from ._sentinel import sentinel
+from . import sentinel
 from ._tree_printer import tree_printer
 
 
