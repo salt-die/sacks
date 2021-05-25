@@ -1,6 +1,5 @@
 from .block import Block
 from .node import Node
-from ._tree_printer import tree_printer
 
 
 class FibHeapNode(Block, Node):
