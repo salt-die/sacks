@@ -1,22 +1,21 @@
 from bisect import bisect_left
 
-from ._tree_printer import tree_printer
-from . import sentinel
+from .node import Node
+from .sentinel import sentinel
 
 NOT_KEY = sentinel(name='NotKey', repr='NOT_KEY')
 
 
-class RadixNode:
+class RadixNode(Node):
     """Primitive of an Adaptive Radix Tree.
     """
-    __slots__ = 'prefix', 'data', 'children',
+    __slots__ = 'data',
 
     NOT_KEY = NOT_KEY
 
-    def __init__(self, prefix='', data=NOT_KEY):
-        self.prefix = prefix
+    def __init__(self, value='', data=NOT_KEY):
+        super().__init__(value)
         self.data = data
-        self.children = [ ]
 
     @property
     def is_key(self):
@@ -29,26 +28,26 @@ class RadixNode:
 
     def iter_keys(self):
         if self.is_key:
-            yield self.prefix
+            yield self.value
         for child in self.children:
-            yield from (self.prefix + key for key in child.iter_keys())
+            yield from (self.value + key for key in child.iter_keys())
 
     def find(self, node):
         """If node is a descendent return its data, else raise a KeyError.
         """
-        if not node.prefix:
+        if not node.value:
             if self.is_key:
                 return self.data
-            raise KeyError(node.prefix)
+            raise KeyError(node.value)
 
         children = self.children
 
         i = bisect_left(children, node)
-        if i == len(children) or children[i].matchlen(node) != len(children[i].prefix):
-            raise KeyError(node.prefix)
+        if i == len(children) or children[i].matchlen(node) != len(children[i].value):
+            raise KeyError(node.value)
 
         child = children[i]
-        node.prefix = node.prefix[len(child.prefix):]
+        node.value = node.value[len(child.value):]
         return child.find(node)
 
     def add(self, node):
@@ -59,7 +58,7 @@ class RadixNode:
         -----
         To track tree size we return True if the node is a new key.
         """
-        if not node.prefix:
+        if not node.value:
             is_new_key = not self.is_key
             self.data = node.data
             return is_new_key
@@ -72,17 +71,17 @@ class RadixNode:
             return True
 
         child = children[i]
-        node.prefix = node.prefix[m:]
-        if m < len(child.prefix):
+        node.value = node.value[m:]
+        if m < len(child.value):
             child.split(m)
         return child.add(node)
 
     def split(self, n):
         """
-        Split this node's prefix at index `n` and create a new child node
+        Split this node's value at index `n` and create a new child node
         with the suffix that adopts this node's children.
         """
-        self.prefix, suffix = self.prefix[:n], self.prefix[n:]
+        self.value, suffix = self.value[:n], self.value[n:]
 
         new_node = RadixNode(suffix, data=self.data)
         new_node.children = self.children
@@ -101,13 +100,13 @@ class RadixNode:
         children = self.children
 
         i = bisect_left(children, node)
-        if i == len(children) or children[i].matchlen(node) != len(children[i].prefix):
-            raise KeyError(node.prefix)
+        if i == len(children) or children[i].matchlen(node) != len(children[i].value):
+            raise KeyError(node.value)
 
         child = children[i]
-        if len(node.prefix) == len(child.prefix):
+        if len(node.value) == len(child.value):
             if not child.is_key:
-                raise KeyError(node.prefix)
+                raise KeyError(node.value)
 
             if child.children:
                 child.data = NOT_KEY
@@ -116,7 +115,7 @@ class RadixNode:
                 self.children.pop(i)
                 self.join()
         else:
-            node.prefix = node.prefix[len(child.prefix):]
+            node.value = node.value[len(child.value):]
             child.delete(node)
 
     def join(self):
@@ -126,15 +125,15 @@ class RadixNode:
             return
 
         child ,= self.children
-        self.prefix += child.prefix
+        self.value += child.value
         self.data = child.data
         self.children = child.children
 
     def matchlen(self, other):
-        """Number of matching items at the beginning of self and other's prefixes.
+        """Number of matching items at the beginning of self and other's values.
         """
         matched = 0
-        for k, p in zip(other.prefix, self.prefix):
+        for k, p in zip(other.value, self.value):
             if k != p:
                 break
             matched += 1
@@ -142,14 +141,9 @@ class RadixNode:
         return matched
 
     def __lt__(self, other):
-        """Nodes ordered by first item of prefix.  This is enough as prefixes can't overlap at any given depth.
+        """Nodes ordered by first item of value.  This is enough as values can't overlap at any given depth.
         """
-        return self.prefix[:1] < other.prefix[:1]
+        return self.value[:1] < other.value[:1]
 
     def __repr__(self):
-        return f"{type(self).__name__}(prefix='{self.prefix}', data={self.data!r})"
-
-    def __str__(self):
-        """Tree structure of nodes as a string.
-        """
-        return '\n'.join(tree_printer(repr(self.prefix), self.children))
+        return f"{type(self).__name__}(value='{self.value}', data={self.data!r})"
