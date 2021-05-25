@@ -28,7 +28,7 @@ def pair(children):
     first, second, *rest = children
     return meld(meld(first, second), pair(rest))
 
-# Note if descrease_key is added to PairingHeap, PairingNode.children should be changed to a linked-list for efficient deletion operations.
+# Note if descrease_key is added to PairingHeap, Node.children should be changed to a linked-list for efficient deletion operations.
 class PairingHeap(Heap):
     """
     A simple heap-ordered tree with excellent practical performance.
