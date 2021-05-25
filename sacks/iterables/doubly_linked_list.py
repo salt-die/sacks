@@ -19,10 +19,9 @@ class DoublyLinkedList(Container, Reversible):
         self.extend(iterable)
 
     def __iter__(self):
-        current = self.root.next
-        while current is not self.root:
+        current = self.root
+        while (current := current.next) is not self.root:
             yield current.value
-            current = current.next
 
     def __reversed__(self):
         current = self.root.prev
