@@ -143,7 +143,7 @@ class RadixNode(Node):
     def __lt__(self, other):
         """Nodes ordered by first item of value.  This is enough as values can't overlap at any given depth.
         """
-        return self.value[:1] < other.value[:1]
+        return self.value[:1] < other.value[:1]  # Slice because len(value) could be 0
 
     def __repr__(self):
-        return f"{type(self).__name__}(value='{self.value}', data={self.data!r})"
+        return f'{type(self).__name__}(value={self.value!r}, data={self.data!r})'
