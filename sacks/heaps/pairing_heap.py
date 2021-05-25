@@ -38,15 +38,9 @@ class PairingHeap(Heap):
     [https://en.wikipedia.org/wiki/Pairing_heap]
 
     """
-    def __init__(self):
-        self.root = None
-        self._size = 0
-
     def heappush(self, value):
-        node = Node(value)
-        self.root = meld(self.root, node)
+        self.root = meld(self.root, Node(value))
         self._size += 1
-        return Entry(node, self)
 
     def heappop(self):
         if not self:

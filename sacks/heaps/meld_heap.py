@@ -32,10 +32,6 @@ class MeldableHeap(Heap):
     [https://en.wikipedia.org/wiki/Randomized_meldable_heap]
 
     """
-    def __init__(self):
-        self.root = None
-        self._size = 0
-
     def heappush(self, value):
         self.root = meld(self.root, BinaryNode(value))
         self._size += 1

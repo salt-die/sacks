@@ -48,10 +48,6 @@ class FibonacciHeap(Heap):
     [https://en.wikipedia.org/wiki/Fibonacci_heap]
 
     """
-    def __init__(self):
-        self.root = None
-        self._size = 0
-
     def heappush(self, value):
         node = FibHeapNode(value)
         self.root = merge_lists(self.root, node)

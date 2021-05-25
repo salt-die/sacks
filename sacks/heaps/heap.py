@@ -16,6 +16,13 @@ NEG_INF = sentinel(
 class Heap(ABC, Sized):
     __slots__ = '_size', 'root',
 
+    def __init__(self, iterable=()):
+        self.root = None
+        self._size = 0
+
+        for item in iterable:
+            self.heappush(item)
+
     def __len__(self):
         return self._size
 
@@ -31,6 +38,7 @@ class Heap(ABC, Sized):
         """
         pass
 
+    @property
     def min(self):
         if not self:
             raise IndexError('empty heap')
