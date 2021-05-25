@@ -1,5 +1,5 @@
 from .heap import Heap, Entry
-from ..primitives import PairingNode
+from ..primitives import Node
 
 def meld(a, b):
     """Merge two heaps, destructively.
@@ -43,7 +43,7 @@ class PairingHeap(Heap):
         self._size = 0
 
     def heappush(self, value):
-        node = PairingNode(value)
+        node = Node(value)
         self.root = meld(self.root, node)
         self._size += 1
         return Entry(node, self)
