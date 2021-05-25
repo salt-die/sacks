@@ -1,6 +1,6 @@
 from abc import abstractmethod, ABC
 
-from . import sentinel
+from .sentinel import sentinel
 from ._tree_printer import tree_printer
 
 
@@ -250,7 +250,7 @@ class RopeInternal(RopeNode):
         order from top to bottom.
 
         """
-        return '\n'.join(tree_printer(str(self.weight), (self.left, self.right)))
+        return '\n'.join(tree_printer(self.weight, (self.left, self.right)))
 
 
 class RopeLeaf(RopeNode):
