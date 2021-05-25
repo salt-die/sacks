@@ -36,7 +36,7 @@ class AdaptiveRadixTree(MutableMapping):
         self._len += self._root.add(RadixNode(item, data=value))
 
     def __delitem__(self, item):
-        if item == self._root.prefix:
+        if item == self._root.value:
             # Special case for the root (node deletions are expected
             # to be from parents of the node, but the root has no parents).
             # Note the root won't be removed, but its data may be erased.
