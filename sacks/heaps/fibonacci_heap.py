@@ -30,10 +30,11 @@ def merge_trees(trees):
             if root.degree not in degree_table:
                 degree_table[root.degree] = root
                 break
-            else:
-                other = degree_table.pop(root.degree)
-                root, child = sorted((root, other))
-                root.add_child(child)
+
+            child = degree_table.pop(root.degree)
+            if root > child:
+                root, child = child, root
+            root.add_child(child)
 
     return min(root)
 
