@@ -13,7 +13,7 @@ def raise_if_invalidated(cls):
         @wraps(func)
         def wrapper(self, *args, **kwargs):
             if len(self.sequence) != self._olen:
-                raise InvalidatedView("sequence length changed")
+                raise InvalidatedView('sequence length changed')
             return func(self, *args, **kwargs)
         return wrapper
 
@@ -36,6 +36,7 @@ class View(MutableSequence):
     Raises
     ------
     `InvalidatedView` if the underlying sequence's length changes.
+
     """
     __slots__ = 'sequence', '_olen', '_range',
 
