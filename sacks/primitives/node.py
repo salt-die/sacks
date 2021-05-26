@@ -18,6 +18,8 @@ class BaseNode:
 
 
 class Node(BaseNode):
+    __slots__ = 'children',
+
     def __init__(self, value):
         super().__init__(value)
         self.children = [ ]
@@ -27,6 +29,8 @@ class Node(BaseNode):
 
 
 class BinaryNode(BaseNode):
+    __slots__ = 'left', 'right',
+
     def __init__(self, value):
         super().__init__(value)
         self.left = None
