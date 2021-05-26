@@ -26,30 +26,21 @@ class AdaptiveRadixTree(MutableMapping):
 
     def __getitem__(self, item):
         try:
-            return self._root.find(RadixNode(item))
+            return self._root.find(item)
         except KeyError:
             raise KeyError(item) from None
 
     def __setitem__(self, item, value):
         if not isinstance(item, self._type):
             raise TypeError(f'{type(item).__name__} is not {self._type.__name__}')
-        self._len += self._root.add(RadixNode(item, data=value))
+
+        self._len += self._root.add(item, value)
 
     def __delitem__(self, item):
-        if item == self._root.value:
-            # Special case for the root (node deletions are expected
-            # to be from parents of the node, but the root has no parents).
-            # Note the root won't be removed, but its data may be erased.
-            if self._root.is_key:
-                self.root.data = RadixNode.NOT_KEY
-                self._len -= 1
-                return
-            raise KeyError(item)
-
         try:
-            self._root.delete(RadixNode(item))
-        except KeyError as e:
-            raise KeyError(item) from e
+            self._root.delete(item)
+        except KeyError:
+            raise KeyError(item) from None
         else:
             self._len -= 1
 
@@ -60,12 +51,20 @@ class AdaptiveRadixTree(MutableMapping):
     def __iter__(self):
         yield from self._root.iter_keys()
 
+    keys = __iter__
+
+    def values(self):
+        yield from self._root.iter_datas()
+
+    def items(self):
+        yield from self._root.iter_items()
+
     def __len__(self):
         return self._len
 
     def __repr__(self):
-        items = ', '.join(f'{key!r}: {self[key]!r}' for key in self)
-        return f'{type(self).__name__}(type={self._type.__name__}, {{{items}}})'
+        items = ', '.join(f'{key!r}: {value!r}' for key, value in self.items())
+        return f'{type(self).__name__}(type={self._type.__name__}, **{{{items}}})'
 
     def __str__(self):
-        return str(self._root)
+        return '●' + str(self._root)
