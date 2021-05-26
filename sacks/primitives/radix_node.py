@@ -19,9 +19,6 @@ class RadixNode(Node):
     def __len__(self):
         return len(self.value)
 
-    def __getitem__(self, key):
-        return self.value.__getitem__(key)
-
     @property
     def is_key(self):
         return self.data is not NOT_KEY
