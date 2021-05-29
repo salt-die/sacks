@@ -48,8 +48,8 @@ class FibonacciHeap(Heap):
     [https://en.wikipedia.org/wiki/Fibonacci_heap]
 
     """
-    def heappush(self, value):
-        node = FibHeapNode(value)
+    def heappush(self, key):
+        node = FibHeapNode(key)
         self.root = merge_lists(self.root, node)
         self._size += 1
         return Entry(node, self)
@@ -77,8 +77,8 @@ class FibonacciHeap(Heap):
 
         return result
 
-    def decrease_key(self, node, value):
-        node.value = value
+    def decrease_key(self, node, key):
+        node.key = key
 
         if not node.is_root and node < node.parent:
             self.cut(node)

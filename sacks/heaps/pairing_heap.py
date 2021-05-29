@@ -38,8 +38,8 @@ class PairingHeap(Heap):
     [https://en.wikipedia.org/wiki/Pairing_heap]
 
     """
-    def heappush(self, value):
-        self.root = meld(self.root, Node(value))
+    def heappush(self, key):
+        self.root = meld(self.root, Node(key))
         self._size += 1
 
     def heappop(self):
@@ -49,7 +49,7 @@ class PairingHeap(Heap):
         self._size -= 1
 
         try:
-            return self.root.value
+            return self.root.key
         finally:
             self.root = pair(self.root.children)
 

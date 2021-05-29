@@ -30,17 +30,17 @@ class AdaptiveRadixTree(MutableMapping):
         except KeyError:
             raise KeyError(item) from None
 
-    def __setitem__(self, item, value):
-        if not isinstance(item, self._type):
-            raise TypeError(f'{type(item).__name__} is not {self._type.__name__}')
+    def __setitem__(self, key, value):
+        if not isinstance(key, self._type):
+            raise TypeError(f'{type(key).__name__} is not {self._type.__name__}')
 
-        self._len += self._root.add(item, value)
+        self._len += self._root.add(key, value)
 
-    def __delitem__(self, item):
+    def __delitem__(self, key):
         try:
-            self._root.delete(item)
+            self._root.delete(key)
         except KeyError:
-            raise KeyError(item) from None
+            raise KeyError(key) from None
         else:
             self._len -= 1
 

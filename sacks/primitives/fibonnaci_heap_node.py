@@ -7,8 +7,8 @@ class FibHeapNode(Block, Node):
     """
     __slots__ = 'degree', 'marked',
 
-    def __init__(self, value):
-        super().__init__(value)
+    def __init__(self, key):
+        super().__init__(key)
 
         self.parent = None
         self.children = None

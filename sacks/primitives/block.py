@@ -1,10 +1,10 @@
 class Block:
     """Primitive element of a doubly-linked list.
     """
-    __slots__ = 'value', 'prev', 'next',
+    __slots__ = 'key', 'prev', 'next',
 
-    def __init__(self, value=None, prev=None, next=None):
-        self.value = value
+    def __init__(self, key=None, prev=None, next=None):
+        self.key = key
         self.prev = prev or self
         self.next = next or self
 
@@ -23,11 +23,11 @@ class Block:
         self.prev.next = self.next.prev = self
 
     def pop(self):
-        """Remove this block from its list, de-reference its links, and return its `value`.
+        """Remove this block from its list, de-reference its links, and return its `key`.
         """
         self.remove()
 
         # Remove possible circular references keeping this object alive
         self.next = self.prev = None
 
-        return self.value
+        return self.key

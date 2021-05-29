@@ -21,12 +21,12 @@ class DoublyLinkedList(Container, Reversible):
     def __iter__(self):
         current = self.root
         while (current := current.next) is not self.root:
-            yield current.value
+            yield current.key
 
     def __reversed__(self):
         current = self.root.prev
         while current is not self.root:
-            yield current.value
+            yield current.key
             current = current.prev
 
     def __contains__(self, item):
@@ -38,11 +38,11 @@ class DoublyLinkedList(Container, Reversible):
     def __bool__(self):
         return self.root is not self.root.next
 
-    def append(self, value):
-        return Block(value, prev=self.root.prev, next=self.root)
+    def append(self, key):
+        return Block(key, prev=self.root.prev, next=self.root)
 
-    def appendleft(self, value):
-        return Block(value, prev=self.root, next=self.root.next)
+    def appendleft(self, key):
+        return Block(key, prev=self.root, next=self.root.next)
 
     def extend(self, iterable):
         for item in iterable:

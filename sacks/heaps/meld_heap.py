@@ -32,8 +32,8 @@ class MeldableHeap(Heap):
     [https://en.wikipedia.org/wiki/Randomized_meldable_heap]
 
     """
-    def heappush(self, value):
-        self.root = meld(self.root, BinaryNode(value))
+    def heappush(self, key):
+        self.root = meld(self.root, BinaryNode(key))
         self._size += 1
 
     def heappop(self):
@@ -43,7 +43,7 @@ class MeldableHeap(Heap):
         self._size -= 1
 
         try:
-            return self.root.value
+            return self.root.key
         finally:
             self.root = meld(self.root.left, self.root.right)
 

@@ -9,19 +9,19 @@ NOT_KEY = sentinel(name='NotKey', repr='NOT_KEY')
 class RadixNode(Node):
     """Primitive of an Adaptive Radix Tree.
     """
-    __slots__ = 'data',
+    __slots__ = 'value',
 
-    def __init__(self, value='', data=NOT_KEY, parent=None):
-        super().__init__(value)
-        self.data = data
+    def __init__(self, key='', value=NOT_KEY, parent=None):
+        super().__init__(key)
+        self.value = value
         self.parent = parent
 
     def __len__(self):
-        return len(self.value)
+        return len(self.key)
 
     @property
     def is_key(self):
-        return self.data is not NOT_KEY
+        return self.value is not NOT_KEY
 
     def iter_nodes(self):
         yield self
@@ -31,30 +31,30 @@ class RadixNode(Node):
 
     def iter_keys(self):
         if self.is_key:
+            yield self.key
+
+        for child in self.children:
+            yield from (self.key + key for key in child.iter_keys())
+
+    def iter_values(self):
+        if self.is_key:
             yield self.value
 
         for child in self.children:
-            yield from (self.value + key for key in child.iter_keys())
-
-    def iter_datas(self):
-        if self.is_key:
-            yield self.data
-
-        for child in self.children:
-            yield from child.iter_datas()
+            yield from child.iter_values()
 
     def iter_items(self):
         if self.is_key:
-            yield self.value, self.data
+            yield self.key, self.value
 
         for child in self.children:
-            yield from ((self.value + key, data) for key, data in child.iter_items())
+            yield from ((self.key + key, value) for key, value in child.iter_items())
 
     def matchlen(self, other):
         """Return length of common prefix.
         """
         matched = 0
-        for k, p in zip(self.value, other):
+        for k, p in zip(self.key, other):
             if k != p:
                 break
             matched += 1
@@ -62,11 +62,11 @@ class RadixNode(Node):
         return matched
 
     def find(self, key):
-        """Return data associated with key.
+        """Return value associated with key.
         """
         if not key:
             if self.is_key:
-                return self.data
+                return self.value
             raise KeyError(key)
 
         children = self.children
@@ -90,7 +90,7 @@ class RadixNode(Node):
             try:
                 return not self.is_key
             finally:
-                self.data = value
+                self.value = value
 
         children = self.children
 
@@ -107,17 +107,17 @@ class RadixNode(Node):
 
     def split(self, n):
         """
-        Split this node's value at index `n` and create a new child node
+        Split this node's key at index `n` and create a new child node
         with the suffix. The new node adopts this node's children.
         """
-        new_node = RadixNode(self.value[n:], self.data, self)
+        new_node = RadixNode(self.key[n:], self.value, self)
         new_node.children = self.children
         for child in new_node.children:
             child.parent = new_node
 
-        self.value = self.value[:n]
+        self.key = self.key[:n]
         self.children = [ new_node ]
-        self.data = NOT_KEY
+        self.value = NOT_KEY
 
     def delete(self, key):
         """Remove key from children.  Re-joins leafs if possible.
@@ -126,7 +126,7 @@ class RadixNode(Node):
             if not self.is_key:
                 raise KeyError(key)
 
-            self.data = NOT_KEY
+            self.value = NOT_KEY
 
             if self.children:
                 self.join()
@@ -150,15 +150,15 @@ class RadixNode(Node):
 
         child, = self.children
 
-        self.value += child.value
-        self.data = child.data
+        self.key += child.key
+        self.value = child.value
         self.children = child.children
 
         for child in self.children:
             child.parent = self
 
     def __lt__(self, other):
-        return self and other and self.value[0] < other[0]
+        return self and other and self.key[0] < other[0]
 
     def __repr__(self):
-        return f'{type(self).__name__}(value={self.value!r}, data={self.data!r})'
+        return f'{type(self).__name__}(key={self.key!r}, value={self.value!r})'

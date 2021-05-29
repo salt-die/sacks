@@ -33,7 +33,7 @@ class Heap(ABC, Sized):
         pass
 
     @abstractmethod
-    def heappush(self, value):
+    def heappush(self, key):
         """Push item onto heap, maintaining the heap invariant.
         """
         pass
@@ -43,7 +43,7 @@ class Heap(ABC, Sized):
         if not self:
             raise IndexError('empty heap')
 
-        return self.root.value
+        return self.root.key
 
 
 class Entry:
@@ -56,18 +56,18 @@ class Entry:
         self._heap = heap
 
     @property
-    def value(self):
-        return self._node.value
+    def key(self):
+        return self._node.key
 
-    def decrease_key(self, value):
-        if value >= self.value:
-            raise ValueError(f'{value} greater than {self.value}')
+    def decrease_key(self, key):
+        if key >= self.key:
+            raise keyError(f'{key} greater than {self.key}')
 
-        self._heap.decrease_key(self._node, value)
+        self._heap.decrease_key(self._node, key)
 
     def delete(self):
         self.decrease_key(NEG_INF)
         self._heap.heappop()
 
     def __repr__(self):
-        return f'{type(self).__name__}({self.value!r})'
+        return f'{type(self).__name__}({self.key!r})'
