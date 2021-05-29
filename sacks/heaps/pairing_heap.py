@@ -28,6 +28,12 @@ def pair(children):
     first, second, *rest = children
     return meld(meld(first, second), pair(rest))
 
+
+# Just adding __slots__
+class PairNode(Node):
+    __slots__ = 'key', 'parent', 'children',
+
+
 # Note if descrease_key is added to PairingHeap, Node.children should be changed to a linked-list for efficient deletion operations.
 class PairingHeap(Heap):
     """
@@ -39,7 +45,7 @@ class PairingHeap(Heap):
 
     """
     def heappush(self, key):
-        self.root = meld(self.root, Node(key))
+        self.root = meld(self.root, PairNode(key))
         self._size += 1
 
     def heappop(self):
