@@ -63,7 +63,8 @@ class FibonacciHeap(Heap):
         else:
             roots = self.root.next
 
-        result = self.root.pop()
+        result = self.root.key
+        self.root.pop()
 
         self._size -= 1
         if self._size == 0:

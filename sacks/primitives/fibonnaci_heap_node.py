@@ -5,7 +5,7 @@ from .node import Node
 class FibHeapNode(Block, Node):
     """Primitive of a Fibonacci Heap.  A combination of a tree node and a doubly-linked block.
     """
-    __slots__ = 'degree', 'marked',
+    __slots__ = 'key', 'parent', 'children', 'degree', 'marked',
 
     def __init__(self, key):
         super().__init__()

@@ -4,8 +4,6 @@ from ._tree_printer import tree_printer
 class BaseNode:
     """Base for a primitive element of a tree.
     """
-    __slots___ = 'key', 'parent',
-
     def __init__(self, key):
         self.key = key
         self.parent = None
@@ -18,8 +16,6 @@ class BaseNode:
 
 
 class Node(BaseNode):
-    __slots__ = 'children',
-
     def __init__(self, key):
         super().__init__(key)
         self.children = [ ]
@@ -29,7 +25,7 @@ class Node(BaseNode):
 
 
 class BinaryNode(BaseNode):
-    __slots__ = 'left', 'right',
+    __slots__ = 'key', 'parent', 'left', 'right',
 
     def __init__(self, key):
         super().__init__(key)

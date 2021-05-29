@@ -9,7 +9,7 @@ NOT_KEY = sentinel(name='NotKey', repr='NOT_KEY')
 class RadixNode(Node):
     """Primitive of an Adaptive Radix Tree.
     """
-    __slots__ = 'value',
+    __slots__ = 'key', 'parent', 'children', 'value',
 
     def __init__(self, key='', value=NOT_KEY, parent=None):
         super().__init__(key)
