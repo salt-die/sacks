@@ -81,7 +81,9 @@ class FibonacciHeap(Heap):
     def decrease_key(self, node, key):
         node.key = key
 
-        if not node.is_root and node < node.parent:
+        if node.is_root:
+            self.root = min(node, self.root)
+        elif node < node.parent:
             self.cut(node)
 
     def cut(self, node):
