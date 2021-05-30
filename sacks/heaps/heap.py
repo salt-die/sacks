@@ -8,7 +8,9 @@ NEG_INF = sentinel(
     repr='NEG_INF',
     methods={
         '__lt__': lambda self, other: True,
+        '__le__': lambda self, other: True,
         '__gt__': lambda self, other: False,
+        '__ge__': lambda self, other: False,
     },
 )
 
@@ -68,6 +70,10 @@ class Entry:
     def delete(self):
         self.decrease_key(NEG_INF)
         self._heap.heappop()
+        del self._node
+        del self._heap
 
     def __repr__(self):
+        if not hasattr(self, '_node'):
+            return f'{type(self).__name__}(DELETED)'
         return f'{type(self).__name__}({self.key!r})'
