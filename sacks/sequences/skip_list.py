@@ -1,7 +1,8 @@
 from collections.abc import MutableSet
 from random import random
 
-from ..primitives import SkipListBlock, sentinel
+from ..primitives.sentinel import sentinel
+from ..primitives.skip_list_block import SkipListBlock
 
 TAIL = sentinel('Tail', repr='TAIL', methods={
     '__lt__': lambda self, other: False,

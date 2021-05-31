@@ -1,6 +1,6 @@
 from collections.abc import MutableMapping
 
-from ..primitives import RadixNode
+from ..primitives.radix_node import RadixNode
 
 
 class AdaptiveRadixTree(MutableMapping):

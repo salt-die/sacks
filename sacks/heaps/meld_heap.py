@@ -1,7 +1,7 @@
 from random import random
 
 from .heap import Heap
-from ..primitives import BinaryNode
+from ..primitives.node import BinaryNode
 
 def meld(a, b):
     """Merge two trees into a single tree. Rough balancing achieved with a coin-flip.

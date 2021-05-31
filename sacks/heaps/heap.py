@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from collections.abc import Sized
 
-from ..primitives import sentinel
+from ..primitives.sentinel import sentinel
 
 NEG_INF = sentinel(
     name='NegInf',

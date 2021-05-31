@@ -1,5 +1,5 @@
 from .heap import Heap, Entry
-from ..primitives import FibHeapNode
+from ..primitives.fibonnaci_heap_node import FibHeapNode
 
 def merge_lists(a, b):
     """Merge two linked lists and return the least node.

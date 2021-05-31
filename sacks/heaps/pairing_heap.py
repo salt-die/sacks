@@ -1,5 +1,5 @@
 from .heap import Heap, Entry
-from ..primitives import Node
+from ..primitives.node import SlotNode
 
 def meld(a, b):
     """Merge two heaps, destructively.
@@ -29,11 +29,6 @@ def pair(children):
     return meld(meld(first, second), pair(rest))
 
 
-# Just adding __slots__
-class PairNode(Node):
-    __slots__ = 'key', 'parent', 'children',
-
-
 # Note if descrease_key is added to PairingHeap, Node.children should be changed to a linked-list for efficient deletion operations.
 class PairingHeap(Heap):
     """
@@ -45,7 +40,7 @@ class PairingHeap(Heap):
 
     """
     def heappush(self, key):
-        self.root = meld(self.root, PairNode(key))
+        self.root = meld(self.root, SlotNode(key))
         self._size += 1
 
     def heappop(self):

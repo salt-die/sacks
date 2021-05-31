@@ -1,6 +1,6 @@
 from collections.abc import Container, Reversible
 
-from ..primitives import Block
+from ..primitives.block import Block
 
 
 class DoublyLinkedList(Container, Reversible):
