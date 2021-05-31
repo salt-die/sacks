@@ -15,13 +15,18 @@ class BaseNode:
         return f'{type(self).__name__}(key={self.key})'
 
 
-class Node(BaseNode):
+class Node(BaseNode):  # Note no slots so we can inherit from Node.
     def __init__(self, key):
         super().__init__(key)
         self.children = [ ]
 
     def __str__(self):
         return '\n'.join(tree_printer(self.key, self.children))
+
+
+# Node with slots
+class SlotNode(Node):
+    __slots__ = 'key', 'parent', 'children',
 
 
 class BinaryNode(BaseNode):
@@ -32,5 +37,12 @@ class BinaryNode(BaseNode):
         self.left = None
         self.right = None
 
+    @property
+    def children(self):
+        if self.left:
+            yield self.left
+        if self.right:
+            yield self.right
+
     def __str__(self):
-        return '\n'.join(tree_printer(self.key, (self.left, self.right)))
+        return '\n'.join(tree_printer(self.key, list(self.children)))
