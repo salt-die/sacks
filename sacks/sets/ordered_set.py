@@ -1,9 +1,9 @@
-from collections.abc import MutableSet
+from collections.abc import MutableSet, Reversible
 
 from ..iterables import DoublyLinkedList
 
 
-class OrderedSet(MutableSet):
+class OrderedSet(MutableSet, Reversible):
     """An ordered set.
     """
     __slots__ = '_item_map', '_item_seq',
