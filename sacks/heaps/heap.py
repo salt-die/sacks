@@ -62,7 +62,7 @@ class Entry:
         return self._node.key
 
     def decrease_key(self, key):
-        if key >= self.key:
+        if key > self.key:
             raise keyError(f'{key} greater than {self.key}')
 
         self._heap.decrease_key(self._node, key)
@@ -74,6 +74,5 @@ class Entry:
         del self._heap
 
     def __repr__(self):
-        if not hasattr(self, '_node'):
-            return f'{type(self).__name__}(DELETED)'
-        return f'{type(self).__name__}({self.key!r})'
+        key = repr(self.key) if hasattr(self, '_node') else 'DELETED'
+        return f'{type(self).__name__}({key})'
