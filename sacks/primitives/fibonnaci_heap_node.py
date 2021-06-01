@@ -25,8 +25,7 @@ class FibHeapNode(Block, Node):
         self.degree += 1
 
         if self.children:
-            child.next = self.children
-            child.prev = self.children.prev
+            child.prev, child.next = self.children.prev, self.children
             child.insert()
         else:
             self.children = child
