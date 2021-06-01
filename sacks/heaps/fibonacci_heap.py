@@ -10,13 +10,10 @@ def merge_lists(a, b):
     if b is None:
         return a
 
-    prev = b.prev
+    a.prev, b.prev = b.prev, a.prev
 
-    b.prev = a.prev
-    a.prev.next = b
-
-    a.prev = prev
-    prev.next = a
+    b.prev.next = b
+    a.prev.next = a
 
     return min(a, b)
 
@@ -93,10 +90,20 @@ class FibonacciHeap(Heap):
             else:
                 node.parent.marked = True
 
+        if node.next is node:
+            node.parent.children = None
+        else:
+            node.parent.children = node.next
+
         node.marked = False
         node.parent = None
+        node.remove()
 
-        self.root = merge_lists(self.root, node)
+        root = self.root
+        node.prev, node.next = root.prev, root
+        node.insert()
+
+        self.root = min(node, root)
 
     def __repr__(self):
         return f'{type(self).__name__}[size={self._size}]'
