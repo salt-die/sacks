@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from collections.abc import Sized
+from functools import wraps
 
 from ..primitives.sentinel import sentinel
 
@@ -48,6 +49,10 @@ class Heap(ABC, Sized):
         return self.root.key
 
 
+class DeletedEntryError(Exception):
+    ...
+
+
 class Entry:
     """An interface for decreasing/deleting a key in a heap. (Tree nodes will stay private.)
     """
@@ -58,21 +63,34 @@ class Entry:
         self._heap = heap
 
     @property
+    def is_deleted(self):
+        return not hasattr(self, '_node') or not self._node.next
+
+    @property
     def key(self):
+        if self.is_deleted:
+            raise DeletedEntryError
+
         return self._node.key
 
     def decrease_key(self, key):
+        if self.is_deleted:
+            raise DeletedEntryError
+
         if key > self.key:
             raise keyError(f'{key} greater than {self.key}')
 
         self._heap.decrease_key(self._node, key)
 
     def delete(self):
+        if self.is_deleted:
+            raise DeletedEntryError
+
         self.decrease_key(NEG_INF)
         self._heap.heappop()
         del self._node
         del self._heap
 
     def __repr__(self):
-        key = repr(self.key) if hasattr(self, '_node') else 'DELETED'
+        key = 'DELETED' if self.is_deleted else repr(self.key)
         return f'{type(self).__name__}({key})'
