@@ -13,9 +13,7 @@ class Bijection(MutableMapping):
         self._map = { }
         self._reverse_map = { }
 
-        for key, value in args:
-            self[key] = value
-        self.update(kwargs)
+        self.update(dict(*args, **kwargs))
 
     def __contains__(self, item):
         return item in self._map

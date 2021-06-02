@@ -15,14 +15,12 @@ class AdaptiveRadixTree(MutableMapping):
     """
     __slots__ = '_root', '_type', '_len',
 
-    def __init__(self, *items, type=str, **kwargs):
+    def __init__(self, *args, type=str, **kwargs):
         self._root = RadixNode(type())
         self._type = type
         self._len = 0
 
-        for key, value in items:
-            self[key] = value
-        self |= kwargs
+        self |= dict(*args, **kwargs)
 
     def __getitem__(self, item):
         try:

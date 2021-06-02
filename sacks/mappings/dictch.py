@@ -16,9 +16,7 @@ class Dictch(MutableMapping):
         self._items = { }
         self._setch = Setch()
 
-        for key, value in args:
-            self[key] = value
-        self.update(kwargs)
+        self.update(dict(*args, **kwargs))
 
     @property
     def as_sequence(self):
