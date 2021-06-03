@@ -23,6 +23,7 @@ An odd collection of odd collections!
     * SkipList - An ordered (and indexable) sequence with O(log n) search and insertion.
     * View - A mutable view of a sequence.
 * sets
+    * AVLTree - A self-balancing binary search tree.
     * BinarySearchTree - A binary tree with O(log n) containment, addition and deletion of items.
     * BloomFilter - A memory-efficient data structure with probabalistic membership checks.  (requires `bitarray`)
     * DisjointSetForest (or UnionFind) - A collection of disjoint sets with very fast `union` and `find` operations.
