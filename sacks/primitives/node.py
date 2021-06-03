@@ -33,8 +33,7 @@ class BinaryNode(BaseNode):
 
     def __init__(self, key):
         super().__init__(key)
-        self.left = None
-        self.right = None
+        self.left = self.right = None
 
     @property
     def children(self):
