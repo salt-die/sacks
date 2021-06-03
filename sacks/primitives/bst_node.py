@@ -5,9 +5,8 @@ from .sentinel import sentinel
 class BSTNode(BinaryNode):
     __slots__ = ()
 
-    def __init__(self, key, parent):
+    def __init__(self, key):
         self.key = key
-        self.parent = parent
         self.left = self.right = EMPTY
 
     def __contains__(self, key):
@@ -29,7 +28,7 @@ class BSTNode(BinaryNode):
         yield self.key
         yield from reversed(self.left)
 
-    def add_key(self, key, parent):
+    def add_key(self, key):
         if key < self.key:
             self.left = self.left.add_key(key, self)
         else:
@@ -49,17 +48,13 @@ class BSTNode(BinaryNode):
             if not self.right:
                 return self.left
 
-            # "Hard case": Replace node with its successor.
+            # Replace node with its successor.
             successor = self.right
             while successor.left:
                 successor = successor.left
 
             self.key = successor.key
-
-            if successor.parent is self:
-                self.right = successor.right
-            else:
-                successor.parent.left = successor.right
+            self.right = self.right.remove_key(successor.key)
 
         return self
 

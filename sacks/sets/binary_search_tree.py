@@ -51,7 +51,7 @@ class BinarySearchTree(MutableSet, Reversible):
         yield from reversed(self.root)
 
     def add(self, item):
-        self.root = self.root.add_key(item, None)
+        self.root = self.root.add_key(item)
         self._len += 1
 
     def remove(self, item):
