@@ -59,17 +59,10 @@ class BSTNode(BinaryNode):
         return self
 
 
-def default_iter(self):
-    return
-    yield
-
-def remove_key(self, key):
-    raise KeyError(key)
-
 EMPTY = sentinel(name='BSTEmptyNode', repr='EMPTY', methods={
     '__contains__': lambda self, key: False,
-    '__iter__': default_iter,
-    '__reversed__': default_iter,
+    '__iter__': 'default_iter',
+    '__reversed__': 'default_iter',
     'add_key': BSTNode,
-    'remove_key': remove_key,
+    'remove_key': KeyError,
 })

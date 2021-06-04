@@ -63,22 +63,15 @@ class AVLNode(BSTNode):
         return self, unbalanced_node
 
 
-def default_iter(self):
-    return
-    yield
-
-def remove_key(self, key):
-    raise KeyError(key)
-
 EMPTY = sentinel(
     name='AVLEmptyNode',
     repr='EMPTY',
     methods={
         '__contains__': lambda self, key: False,
+        '__iter__': 'default_iter',
+        '__reversed__': 'default_iter',
         'add_key': lambda self, key: (AVLNode(key), ) * 2,
-        'remove_key': remove_key,
-        '__iter__': default_iter,
-        '__reversed__': default_iter,
+        'remove_key': KeyError,
         'left': property(lambda self: self),
         'right': property(lambda self: self),
     },
