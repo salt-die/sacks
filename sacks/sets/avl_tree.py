@@ -3,41 +3,39 @@ from ..primitives.avl_node import EMPTY
 
 def rotate_right(root):
     r"""
+    ```
       root    pivot
        /         \
     pivot -->   root
        \         /
         R       R
+    ```
     """
     pivot = root.left
     root.left = pivot.right
     pivot.right = root
 
-    if pivot.balance == 0:
-        root.balance = -1
-        pivot.balance = 1
-    else:
-        root.balance = pivot.balance = 0
+    root.balance -= 1 + pivot.balance  # Note pivot.balance >= 0
+    pivot.balance -= 1
 
     return pivot
 
 def rotate_left(root):
     r"""
+    ```
     root        pivot
       \          /
      pivot --> root
       /          \
      L            L
+    ```
     """
     pivot = root.right
     root.right = pivot.left
     pivot.left = root
 
-    if pivot.balance == 0:
-        root.balance = 1
-        pivot.balance = -1
-    else:
-        root.balance = pivot.balance = 0
+    root.balance += 1 - pivot.balance  # Note pivot.balance <= 0
+    pivot.balance += 1
 
     return pivot
 
@@ -65,18 +63,22 @@ class AVLTree(BinarySearchTree):
     def balance(self):
         return self.root.balance
 
-    def update_balances(self, root, delta):
-        if root is None:
-            return
-
-        if abs(root.balance) > 1:
+    def rebalance(self, root, delta):
+        """Rebalance the tree after a node addition or removal. (`delta` will be 1 for addition and -1 for removal.)
+        """
+        if root.balance in (-2, 2):
             if root is self.root:
                 self.root = balance(root)
                 self.root.parent = None
-            else:
-                setattr(root.parent, 'left' if root.is_left_child else 'right', balance(root))
+                return
 
-            return
+            parent = root.parent
+            if root.is_left_child:
+                new_root = parent.left = balance(root)
+            else:
+                new_root = parent.right = balance(root)
+
+            return self.rebalance(new_root, delta) if delta == -1 else None  # Keep recursing if node was deleted.
 
         if root is self.root:
             return
@@ -86,17 +88,15 @@ class AVLTree(BinarySearchTree):
         else:
             root.parent.balance -= 1 * delta
 
-        if root.parent.balance != 0:
-            self.update_balances(root.parent, delta)
+        if delta == 1 and root.parent.balance != 0 or delta == -1 and root.parent.balance == 0:
+            self.rebalance(root.parent, delta)
 
     def add(self, item):
-        self.root, unbalanced_node = self.root.add_key(item)
+        self.root, new_node = self.root.add_key(item)
         self._len += 1
-
-        self.update_balances(unbalanced_node, 1)
+        self.rebalance(new_node, delta=1)
 
     def remove(self, item):
         self.root, unbalanced_node = self.root.remove_key(item)
         self._len -= 1
-
-        self.update_balances(unbalanced_node, -1)
+        self.rebalance(unbalanced_node, delta=-1)
