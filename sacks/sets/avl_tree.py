@@ -53,6 +53,8 @@ def balance(root):
 class AVLTree(BinarySearchTree):
     """A self-balancing binary search tree.
     """
+    __slots__ = ()
+
     def __init__(self, iterable=()):
         self.root = EMPTY
         self._len = 0
