@@ -6,6 +6,8 @@ def sentinel(name='', default=None, repr='SENTINEL', abc=None, methods=None, att
     Build and return a better sentinel! Don't settle for `None` or `object()`, you can do better!:
         * Modifying attributes of this object does nothing (with no errors).
         * Abstract methods in `abc` (an abstract base class) not provided in `methods` will return `default`.
+        * If a value in `methods` is `"default_iter"` a default iterator will be provided.
+        * If a value in `methods` is an instance of `Exception` a default function that raises will be provided.
 
     Parameters
     ----------
@@ -51,20 +53,11 @@ def sentinel(name='', default=None, repr='SENTINEL', abc=None, methods=None, att
     The issue is that `None` doesn't implement `Node` so we need to special-case it in all our methods.
     Instead we can create a sentinel that *does* implement Node:
     ```
-    def iter_nodes(self):
-        return
-        yield
-
-    EMPTY = sentinel(methods={ 'iter_nodes': iter_nodes })
+    EMPTY = sentinel(methods={ 'iter_nodes': 'default_iter' })
     ```
 
-    And now our class can be re-written:
+    And now our method can be re-written:
     ```
-    class Node:
-        def __init__(self, left=EMPTY, right=EMPTY):
-            self.left = left
-            self.right = right
-
         def iter_nodes(self):
             yield self
             yield from self.left.iter_nodes()
@@ -75,6 +68,22 @@ def sentinel(name='', default=None, repr='SENTINEL', abc=None, methods=None, att
     """
     attrs = attrs or { }
     methods = methods or { }
+
+    def default_iter(self):
+        return
+        yield
+
+    def error_factory(error):
+        def error_raiser(self, *args):
+            raise error(*args)
+
+        return error_raiser
+
+    for key, value in methods.items():
+        if value == 'default_iter':
+            methods[key] = default_iter
+        elif isinstance(value, type) and issubclass(value, Exception):
+            methods[key] = error_factory(value)
 
     def __init__(self):
         for attr, val in attrs.items():
