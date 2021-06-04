@@ -3,11 +3,11 @@ from .sentinel import sentinel
 
 
 class AVLNode(BSTNode):
-    __slots__ = '_left', '_right', 'balance'
+    __slots__ = '_left', '_right', 'balance',
 
-    def __init__(self, key, parent=None):
+    def __init__(self, key):
         self.key = key
-        self.parent = parent
+        self.parent = None
         self.left = self.right = EMPTY
         self.balance = 0
 
@@ -33,13 +33,13 @@ class AVLNode(BSTNode):
         self._right = node
         node.parent = self
 
-    def add_key(self, key, parent=None):
+    def add_key(self, key):
         if key < self.key:
-            self.left, unbalanced_node = self.left.add_key(key, self)
+            self.left, new_node = self.left.add_key(key)
         else:
-            self.right, unbalanced_node = self.right.add_key(key, self)
+            self.right, new_node = self.right.add_key(key)
 
-        return self, unbalanced_node
+        return self, new_node
 
     def remove_key(self, key):
         if key < self.key:
@@ -47,11 +47,10 @@ class AVLNode(BSTNode):
         elif key > self.key:
             self.right, unbalanced_node = self.right.remove_key(key)
         else:
-            if not self.left:
-                return self.right, self.parent
-
-            if not self.right:
-                return self.left, self.parent
+            if not self.left or not self.right:
+                if self.parent:
+                    self.parent.balance -= 1 if self.is_left_child else -1
+                return self.right or self.left, self.parent
 
             # Replace node with its successor.
             successor = self.right
@@ -76,12 +75,14 @@ EMPTY = sentinel(
     repr='EMPTY',
     methods={
         '__contains__': lambda self, key: False,
-        'add_key': lambda self, key, parent=None: (AVLNode(key, parent), parent),
+        'add_key': lambda self, key: (AVLNode(key), ) * 2,
         'remove_key': remove_key,
         '__iter__': default_iter,
         '__reversed__': default_iter,
         'left': property(lambda self: self),
         'right': property(lambda self: self),
     },
-    attrs={'balance': 0},
+    attrs={
+        'balance': 0,
+    },
 )
