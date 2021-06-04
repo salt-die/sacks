@@ -66,12 +66,13 @@ class AVLTree(BinarySearchTree):
     def rebalance(self, root, delta):
         """Rebalance the tree after a node addition or removal. (`delta` will be 1 for addition and -1 for removal.)
         """
-        if root.balance in (-2, 2):
-            if root is self.root:
+        if root is self.root:
+            if root.balance in (-2, 2):
                 self.root = balance(root)
                 self.root.parent = None
-                return
+            return
 
+        if root.balance in (-2, 2):
             parent = root.parent
             if root.is_left_child:
                 new_root = parent.left = balance(root)
@@ -80,15 +81,9 @@ class AVLTree(BinarySearchTree):
 
             return self.rebalance(new_root, delta) if delta == -1 else None  # Keep recursing if node was deleted.
 
-        if root is self.root:
-            return
+        root.parent.balance += delta if root.is_left_child else -delta
 
-        if root.is_left_child:
-            root.parent.balance += 1 * delta
-        else:
-            root.parent.balance -= 1 * delta
-
-        if delta == 1 and root.parent.balance != 0 or delta == -1 and root.parent.balance == 0:
+        if delta == 1 and root.parent.balance != 0 or delta == -1 and root.parent.balance not in (1, -1):
             self.rebalance(root.parent, delta)
 
     def add(self, item):
