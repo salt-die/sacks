@@ -110,12 +110,30 @@ class Rope(MutableSequence):
         return root
 
     def _rotate_right(self, root):
+        r"""
+        ```
+         root     pivot
+          /         \
+        pivot -->   root
+          \         /
+           R       R
+        ```
+        """
         pivot = root.left
         root.left = pivot.right
         pivot.right = root
         return pivot
 
     def _rotate_left(self, root):
+        r"""
+        ```
+        root        pivot
+          \          /
+         pivot --> root
+          /          \
+         L            L
+        ```
+        """
         pivot = root.right
         root.right = pivot.left
         pivot.left = root
