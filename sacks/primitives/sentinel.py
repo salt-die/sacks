@@ -3,11 +3,11 @@ from inspect import isgeneratorfunction, signature
 
 def sentinel(name='', default=None, repr='SENTINEL', abc=None, methods=None, attrs=None):
     """
-    Build and return a better sentinel! Don't settle for `None` or `object()`, you can do better!:
+    Build a better sentinel!
         * Modifying attributes of this object does nothing (with no errors).
         * Abstract methods in `abc` (an abstract base class) not provided in `methods` will return `default`.
         * If a value in `methods` is `"default_iter"` a default iterator will be provided.
-        * If a value in `methods` is an instance of `Exception` a default function that raises will be provided.
+        * If a value in `methods` is a subclass of `Exception` a default function that raises will be provided.
 
     Parameters
     ----------
