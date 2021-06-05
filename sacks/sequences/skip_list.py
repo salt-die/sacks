@@ -1,4 +1,4 @@
-from collections.abc import MutableSet
+from collections.abc import MutableSet, Sequence
 from random import random
 
 from ..primitives.sentinel import sentinel
@@ -10,7 +10,7 @@ TAIL = sentinel('Tail', repr='TAIL', methods={
 })
 
 
-class SkipList(MutableSet):
+class SkipList(MutableSet, Sequence):
     """
     An ordered sequence with O(log n) search and insertion.
 
