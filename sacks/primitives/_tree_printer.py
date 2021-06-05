@@ -11,7 +11,7 @@ def snake(head, tail, text):
 def tree_printer(root, children):
     """Pretty prints a tree.
     """
-    yield str(root)
+    yield repr(root)
 
     if not children:
         return
