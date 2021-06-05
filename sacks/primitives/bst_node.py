@@ -3,6 +3,8 @@ from .sentinel import sentinel
 
 
 class BSTNode(BinaryNode):
+    """Primitive of a binary search tree.
+    """
     __slots__ = ()
 
     def __init__(self, key):
@@ -30,9 +32,9 @@ class BSTNode(BinaryNode):
 
     def add_key(self, key):
         if key < self.key:
-            self.left = self.left.add_key(key, self)
+            self.left = self.left.add_key(key)
         else:
-            self.right = self.right.add_key(key, self)
+            self.right = self.right.add_key(key)
 
         return self
 

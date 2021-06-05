@@ -3,6 +3,8 @@ from .sentinel import sentinel
 
 
 class AVLNode(BSTNode):
+    """Primitive of a AVL tree.
+    """
     __slots__ = '_left', '_right', 'balance',
 
     def __init__(self, key):

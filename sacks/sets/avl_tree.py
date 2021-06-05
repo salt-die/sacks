@@ -51,7 +51,13 @@ def balance(root):
 
 
 class AVLTree(BinarySearchTree):
-    """A self-balancing binary search tree.
+    """
+    A self-balancing binary search tree.
+
+    Notes
+    -----
+    This version of an AVL tree allows multiple of the same item to be inserted.
+
     """
     __slots__ = ()
 

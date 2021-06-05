@@ -4,7 +4,13 @@ from ..primitives.bst_node import EMPTY
 
 
 class BinarySearchTree(MutableSet, Reversible):
-    """A binary tree with O(log n) containment, addition and deletion of items.
+    """
+    A binary tree with O(log n) containment, addition and deletion of items.
+
+    Notes
+    -----
+    This version of a BST allows multiple of the same item to be inserted.
+
     """
     __slots__ = 'root', '_len',
 
