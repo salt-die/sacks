@@ -65,4 +65,4 @@ class AdaptiveRadixTree(MutableMapping):
         return f'{type(self).__name__}(type={self._type.__name__}, **{{{items}}})'
 
     def __str__(self):
-        return '●' + str(self._root)
+        return str(self._root)
