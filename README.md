@@ -17,10 +17,12 @@ An odd collection of odd collections!
     * Bijection - A one-to-one mapping. `reverse` method allows reverse-lookup.
     * Dictch - Dict with choice. Exposes a sequence of the keys of the mapping, `as_sequence`, for use with `random` module.
 * sequences
+    * Column - A immutable view of the `i`th entry of each sequence in a sequence of sequences.
     * IndexedSet - An indexable set.
     * Necklace - An immutable sequence that "wraps-around".
     * Rope - A binary-tree that allows efficient manipulation of variable-length types.
-    * SkipList - An ordered (and indexable) sequence with O(log n) search and insertion.
+    * SkipList - An ordered sequence with O(log n) search and insertion.
+    * SortedList - Another ordered sequence using Python's built-in types. (A slim version of https://github.com/grantjenks/python-sortedcontainers/.)
     * View - A mutable view of a sequence.
 * sets
     * AVLTree - A self-balancing binary search tree.
