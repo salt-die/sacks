@@ -12,7 +12,7 @@ class BaseNode:
         return self.key < other.key
 
     def __repr__(self):
-        return f'{type(self).__name__}(key={self.key})'
+        return f'{type(self).__name__}(key={self.key!r})'
 
 
 class Node(BaseNode):
