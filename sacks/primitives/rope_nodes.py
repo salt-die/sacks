@@ -3,6 +3,8 @@ from abc import abstractmethod, ABC
 from .sentinel import sentinel
 from ._tree_printer import tree_printer
 
+# Note we don't use NodeBase from `.primitives.node`, this because we keep leaf nodes
+# and internal nodes separated and we use attributes that are specific to ropes.
 
 class RopeNode(ABC):
     """The base primitive of a Rope.
@@ -171,7 +173,7 @@ class RopeInternal(RopeNode):
         self._right.strand = RightStrand(self)
 
     @property
-    def balance_factor(self):
+    def balance(self):
         # For AVL trees one can keep this updated as nodes are inserted, but Ropes can be joined arbitrarily
         # which complicates the matter.  For now we'll make do with recalculating as needed:
         return self.left.height - self.right.height
