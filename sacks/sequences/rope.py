@@ -1,8 +1,61 @@
-# TODO: Keep track of how "messy" a tree is so we can coalesce many short leaves and rebalance.
 from collections.abc import MutableSequence
 
 from ..primitives.rope_nodes import RopeInternal, RopeLeaf
 
+def rotate_right(root):
+    r"""
+    ```
+      root    pivot
+       /        \
+    pivot -->  root
+       \        /
+        R      R
+    ```
+    """
+    pivot = root.left
+    root.left = pivot.right
+    pivot.right = root
+    return pivot
+
+def rotate_left(root):
+    r"""
+    ```
+    root        pivot
+      \          /
+     pivot --> root
+      /          \
+     L            L
+    ```
+    """
+    pivot = root.right
+    root.right = pivot.left
+    pivot.left = root
+    return pivot
+
+def balance(root, recursive=True):
+    if not isinstance(root, RopeInternal):
+        return root
+
+    if recursive:
+        root.left = balance(root.left)
+        root.right = balance(root.right)
+
+    if root.balance > 1:
+        if root.left.balance < 0:
+            root.left = rotate_left(root.left)
+        root = rotate_right(root)
+
+    elif root.balance < -1:
+        if root.right.balance > 0:
+            root.right = rotate_right(root.right)
+        root = rotate_left(root)
+
+    return root
+
+
+# We aren't inheriting from AVLTree as we haven't implemented the bulk operations `join`, `split`, `union`. (Ropes can be joined arbitrarily.)
+# Currently, balancing must be done manually by calling `rebalance`.
+# TODO: Keep track of how "messy" a tree is so we can coalesce many short leaves and rebalance.
 
 class Rope(MutableSequence):
     """
@@ -21,7 +74,7 @@ class Rope(MutableSequence):
 
     Notes
     -----
-    The sequence type should be sliceable and have an `__add__` method.
+    The sequence type should be `str` or be sliceable and constructible from an iterable.
 
     """
     __slots__ = '_root', 'leafsize', 'type', '_len',
@@ -59,17 +112,18 @@ class Rope(MutableSequence):
         for seq in self._root:
             yield from seq
 
-    @property
-    def sequence(self):
+    def reduce(self):
         """A monolithic sum of all the leaves of this rope.
         """
-        return ''.join(self._root) if self.type is str else sum(self._root, self.type())
+        if self.type is str:
+            return ''.join(self)
+        return self.type(self)
 
     @property
-    def balance_factor(self):
+    def balance(self):
         """The difference in heights of the left and right sides of this rope.
         """
-        return self._root.balance_factor
+        return self._root.balance
 
     def copy(self):
         """Return a copy of this rope.
@@ -84,60 +138,10 @@ class Rope(MutableSequence):
         """
         self._root.collapse()
 
-    def balance(self):
+    def rebalance(self, recursive=True):
         """Balance the tree.
         """
-        self._root = self._balance(self._root)
-
-    def _balance(self, root):
-        if not isinstance(root, RopeInternal):
-            return root
-
-        root.left = self._balance(root.left)
-        root.right = self._balance(root.right)
-
-        factor = root.balance_factor
-        if factor > 1:
-            if root.left.balance_factor < 0:
-                root.left = self._rotate_left(root.left)  # left-right case
-            root = self._rotate_right(root)
-
-        elif factor < -1:
-            if root.right.balance_factor > 0:
-                root.right = self._rotate_right(root.right)  # right-left case
-            root = self._rotate_left(root)
-
-        return root
-
-    def _rotate_right(self, root):
-        r"""
-        ```
-         root     pivot
-          /         \
-        pivot -->   root
-          \         /
-           R       R
-        ```
-        """
-        pivot = root.left
-        root.left = pivot.right
-        pivot.right = root
-        return pivot
-
-    def _rotate_left(self, root):
-        r"""
-        ```
-        root        pivot
-          \          /
-         pivot --> root
-          /          \
-         L            L
-        ```
-        """
-        pivot = root.right
-        root.right = pivot.left
-        pivot.left = root
-        return pivot
+        self._root = balance(self._root, recursive)
 
     def _normalize_index(self, index):
         """Common functionality for parsing slices for __getitem__, __setitem__, and __delitem__.
@@ -163,11 +167,10 @@ class Rope(MutableSequence):
 
     def __getitem__(self, key):
         start, length = self._normalize_index(key)
-
+        it = self._root.slice(start, length)
         if self.type is str:
-            return "".join(self._root.slice(start, length))
-
-        return sum(self._root.slice(start, length), self.type())
+            return ''.join(it)
+        return self.type(it)
 
     def __setitem__(self, key, sequence):
         first_split, second_split = self._normalize_index(key)
@@ -213,7 +216,7 @@ class Rope(MutableSequence):
 
         Warning
         -------
-        This doesn't copy.  `other` will be a view inside `self` or vice-versa.  Modifications to one will affect the other.
+        This is destructive.  `other` will be a view inside `self` or vice-versa.  Modifications to one will affect the other.
 
         """
         if self.type != other.type:
@@ -232,26 +235,20 @@ class Rope(MutableSequence):
 
     def _join_right(self, other, balance):
         left_most = other._root
-        while balance < 0:
-            if isinstance(left_most, RopeInternal):
-                left_most = left_most.left
-                balance += 1
-            else: # Either `other` isn't balanced or the left-most path is too short.  Either way, we're done.
-                break
+        while balance < 0 and isinstance(left_most, RopeInternal):
+            left_most = left_most.left
+            balance += 1
 
-        left_most.strand.attach(RopeInternal(self._root, left_most))
+        left_most.strand.attach( RopeInternal(self._root, left_most) )
         self._root = other._root
 
     def _join_left(self, other, balance):
         right_most = self._root
-        while balance > 0:
-            if isinstance(right_most, RopeInternal):
-                right_most = right_most.right
-                balance -= 1
-            else: # Either `self` isn't balanced or the right-most path is too short.  Either way, we're done.
-                break
+        while balance > 0 and isinstance(right_most, RopeInternal):
+            right_most = right_most.right
+            balance -= 1
 
-        right_most.strand.attach(RopeInternal(right_most, other._root))
+        right_most.strand.attach( RopeInternal(right_most, other._root) )
 
     def insert(self, index, sequence):
         """Insert sequence before `index`.
@@ -278,10 +275,10 @@ class Rope(MutableSequence):
         return self, right
 
     def __repr__(self):
-        return f'{type(self).__name__}({self.sequence!r}, leafsize={self.leafsize}, type={self.type.__name__})'
+        return f'{type(self).__name__}({self.reduce()!r}, leafsize={self.leafsize}, type={self.type.__name__})'
 
     def __str__(self):
-        return str(self.sequence)
+        return str(self.reduce())
 
     def prettyprint(self):
         print(self._root)
