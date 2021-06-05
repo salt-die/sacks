@@ -12,20 +12,24 @@ class DoublyLinkedList(Container, Reversible):
     Appends return the underlying block primitives for structures that may want access to them.
 
     """
-    __slots__ = 'root',
+    __slots__ = '_root',
 
     def __init__(self, iterable=()):
-        self.root = Block()
+        self._root = Block()
         self.extend(iterable)
 
+    @property
+    def root(self):
+        return self._root
+
     def __iter__(self):
-        current = self.root
-        while (current := current.next) is not self.root:
+        current = self._root
+        while (current := current.next) is not self._root:
             yield current.value
 
     def __reversed__(self):
-        current = self.root.prev
-        while current is not self.root:
+        current = self._root.prev
+        while current is not self._root:
             yield current.value
             current = current.prev
 
@@ -36,13 +40,13 @@ class DoublyLinkedList(Container, Reversible):
         return False
 
     def __bool__(self):
-        return self.root is not self.root.next
+        return self._root is not self._root.next
 
     def append(self, value):
-        return Block(value, prev=self.root.prev, next=self.root)
+        return Block(value, prev=self._root.prev, next=self._root)
 
     def appendleft(self, value):
-        return Block(value, prev=self.root, next=self.root.next)
+        return Block(value, prev=self._root, next=self._root.next)
 
     def extend(self, iterable):
         for item in iterable:
@@ -56,18 +60,18 @@ class DoublyLinkedList(Container, Reversible):
         if not self:
             raise IndexError('pop from empty list')
 
-        return self.root.prev.pop()
+        return self._root.prev.pop()
 
     def popleft(self):
         if not self:
             raise IndexError('pop from empty list')
 
-        return self.root.next.pop()
+        return self._root.next.pop()
 
     def rotate(self):
         """Rotate this deque 1 step to the right.
         """
-        root = self.root
+        root = self._root
 
         root.remove()
         root.next = root.prev
@@ -75,7 +79,7 @@ class DoublyLinkedList(Container, Reversible):
         root.insert()
 
     def __del__(self):
-        self.root.pop()  # Remove root's circular reference
+        self._root.pop()  # Remove root's circular reference
 
     def __repr__(self):
         return f'{type(self).__name__}([{", ".join(repr(item) for item in self)}])'

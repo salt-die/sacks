@@ -50,6 +50,8 @@ def balance(root):
     return rotate_left(root)
 
 
+# TODO: Implement join, split, union bulk operations. :class: Rope can inherit from AVLTree once implemented.
+
 class AVLTree(BinarySearchTree):
     """
     A self-balancing binary search tree.
@@ -62,14 +64,14 @@ class AVLTree(BinarySearchTree):
     __slots__ = ()
 
     def __init__(self, iterable=()):
-        self.root = EMPTY
+        self._root = EMPTY
         self._len = 0
 
         self |= iterable
 
     @property
     def balance(self):
-        return self.root.balance
+        return self._root.balance
 
     def rebalance(self, root, delta):
         """Rebalance the tree after a node addition or removal. (`delta` will be 1 for addition and -1 for removal.)
@@ -77,10 +79,10 @@ class AVLTree(BinarySearchTree):
         if not root:
             return
 
-        if root is self.root:
+        if root is self._root:
             if root.balance in (-2, 2):
-                self.root = balance(root)
-                self.root.parent = EMPTY
+                self._root = balance(root)
+                self._root.parent = EMPTY
             return
 
         if root.balance in (-2, 2):
@@ -98,11 +100,11 @@ class AVLTree(BinarySearchTree):
             self.rebalance(root.parent, delta)
 
     def add(self, item):
-        self.root, new_node = self.root.add_key(item)
+        self._root, new_node = self._root.add_key(item)
         self._len += 1
         self.rebalance(new_node, delta=1)
 
     def remove(self, item):
-        self.root, unbalanced_node = self.root.remove_key(item)
+        self._root, unbalanced_node = self._root.remove_key(item)
         self._len -= 1
         self.rebalance(unbalanced_node, delta=-1)

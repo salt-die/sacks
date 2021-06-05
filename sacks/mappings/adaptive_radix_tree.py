@@ -22,6 +22,10 @@ class AdaptiveRadixTree(MutableMapping):
 
         self |= dict(*args, **kwargs)
 
+    @property
+    def root(self):
+        return self._root
+
     def __getitem__(self, item):
         try:
             return self._root.find(item)

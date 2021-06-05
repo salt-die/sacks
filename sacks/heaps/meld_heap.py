@@ -33,7 +33,7 @@ class MeldableHeap(Heap):
 
     """
     def heappush(self, key):
-        self.root = meld(self.root, BinaryNode(key))
+        self._root = meld(self._root, BinaryNode(key))
         self._size += 1
 
     def heappop(self):
@@ -43,12 +43,12 @@ class MeldableHeap(Heap):
         self._size -= 1
 
         try:
-            return self.root.key
+            return self._root.key
         finally:
-            self.root = meld(self.root.left, self.root.right)
+            self._root = meld(self._root.left, self._root.right)
 
     def __repr__(self):
         return f'{type(self).__name__}[size={self._size}]'
 
     def __str__(self):
-        return str(self.root)
+        return str(self._root)

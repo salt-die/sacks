@@ -12,26 +12,24 @@ class BinarySearchTree(MutableSet, Reversible):
     This version of a BST allows multiple of the same item to be inserted.
 
     """
-    __slots__ = 'root', '_len',
+    __slots__ = '_root', '_len',
 
     def __init__(self, iterable=()):
-        self.root = EMPTY
+        self._root = EMPTY
         self._len = 0
 
         self |= iterable
 
-    def __len__(self):
-        return self._len
-
-    def __contains__(self, item):
-        return item in self.root
+    @property
+    def root(self):
+        return self._root
 
     @property
     def min(self):
         if not self:
             raise ValueError('tree is empty')
 
-        current = self.root
+        current = self._root
 
         while current.left:
             current = current.left
@@ -43,25 +41,31 @@ class BinarySearchTree(MutableSet, Reversible):
         if not self:
             raise ValueError('tree is empty')
 
-        current = self.root
+        current = self._root
 
         while current.right:
             current = current.right
 
         return current.key
 
+    def __len__(self):
+        return self._len
+
+    def __contains__(self, item):
+        return item in self._root
+
     def __iter__(self):
-        yield from self.root
+        yield from self._root
 
     def __reversed__(self):
-        yield from reversed(self.root)
+        yield from reversed(self._root)
 
     def add(self, item):
-        self.root = self.root.add_key(item)
+        self._root = self._root.add_key(item)
         self._len += 1
 
     def remove(self, item):
-        self.root = self.root.remove_key(item)
+        self._root = self._root.remove_key(item)
         self._len -= 1
 
     def discard(self, item):
@@ -74,4 +78,4 @@ class BinarySearchTree(MutableSet, Reversible):
         return f'{type(self).__name__}([{", ".join(map(repr, self))}])'
 
     def __str__(self):
-        return str(self.root)
+        return str(self._root)

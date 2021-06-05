@@ -47,7 +47,7 @@ class FibonacciHeap(Heap):
     """
     def heappush(self, key):
         node = FibHeapNode(key)
-        self.root = merge_lists(self.root, node)
+        self._root = merge_lists(self._root, node)
         self._size += 1
         return Entry(node, self)
 
@@ -55,23 +55,23 @@ class FibonacciHeap(Heap):
         if not self:
             raise IndexError('pop from empty heap')
 
-        if self.root.next is self.root:
+        if self._root.next is self._root:
             roots = None
         else:
-            roots = self.root.next
+            roots = self._root.next
 
-        result = self.root.key
-        self.root.pop()
+        result = self._root.key
+        self._root.pop()
 
         self._size -= 1
         if self._size == 0:
-            self.root = None
+            self._root = None
         else:
-            if children := self.root.children:
+            if children := self._root.children:
                 for root in children:
                     root.parent = None
 
-            self.root = merge_trees(merge_lists(roots, children))
+            self._root = merge_trees(merge_lists(roots, children))
 
         return result
 
@@ -79,7 +79,7 @@ class FibonacciHeap(Heap):
         node.key = key
 
         if node.is_root:
-            self.root = min(node, self.root)
+            self._root = min(node, self._root)
         elif node < node.parent:
             self.cut(node)
 
@@ -99,14 +99,14 @@ class FibonacciHeap(Heap):
         node.parent = None
         node.remove()
 
-        root = self.root
+        root = self._root
         node.prev, node.next = root.prev, root
         node.insert()
 
-        self.root = min(node, root)
+        self._root = min(node, root)
 
     def __repr__(self):
         return f'{type(self).__name__}[size={self._size}]'
 
     def __str__(self):
-        return '\n'.join(map(str, self.root))
+        return '\n'.join(map(str, self._root))

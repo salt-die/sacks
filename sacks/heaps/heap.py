@@ -17,14 +17,18 @@ NEG_INF = sentinel(
 
 
 class Heap(ABC, Sized):
-    __slots__ = '_size', 'root',
+    __slots__ = '_size', '_root',
 
     def __init__(self, iterable=()):
-        self.root = None
+        self._root = None
         self._size = 0
 
         for item in iterable:
             self.heappush(item)
+
+    @property
+    def root(self):
+        return self._root
 
     def __len__(self):
         return self._size
@@ -46,7 +50,7 @@ class Heap(ABC, Sized):
         if not self:
             raise IndexError('empty heap')
 
-        return self.root.key
+        return self._root.key
 
 
 class DeletedEntryError(Exception):

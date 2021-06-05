@@ -40,7 +40,7 @@ class PairingHeap(Heap):
 
     """
     def heappush(self, key):
-        self.root = meld(self.root, SlotNode(key))
+        self._root = meld(self._root, SlotNode(key))
         self._size += 1
 
     def heappop(self):
@@ -50,12 +50,12 @@ class PairingHeap(Heap):
         self._size -= 1
 
         try:
-            return self.root.key
+            return self._root.key
         finally:
-            self.root = pair(self.root.children)
+            self._root = pair(self._root.children)
 
     def __repr__(self):
         return f'{type(self).__name__}[size={self._size}]'
 
     def __str__(self):
-        return str(self.root)
+        return str(self._root)
