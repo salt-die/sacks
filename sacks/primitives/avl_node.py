@@ -9,13 +9,12 @@ class AVLNode(BSTNode):
 
     def __init__(self, key):
         self.key = key
-        self.parent = None
-        self.left = self.right = EMPTY
+        self.parent = self.left = self.right = EMPTY
         self.balance = 0
 
     @property
     def is_left_child(self):
-        return self.parent and self.parent.left is self
+        return self.parent.left is self
 
     @property
     def left(self):
@@ -50,8 +49,7 @@ class AVLNode(BSTNode):
             self.right, unbalanced_node = self.right.remove_key(key)
         else:
             if not self.left or not self.right:
-                if self.parent:
-                    self.parent.balance -= 1 if self.is_left_child else -1
+                self.parent.balance -= 1 if self.is_left_child else -1
                 return self.right or self.left, self.parent
 
             # Replace node with its successor.
@@ -69,13 +67,14 @@ EMPTY = sentinel(
     name='AVLEmptyNode',
     repr='EMPTY',
     methods={
+        'parent': 'identity',
+        'left': 'identity',
+        'right': 'identity',
         '__contains__': lambda self, key: False,
         '__iter__': 'default_iter',
         '__reversed__': 'default_iter',
         'add_key': lambda self, key: (AVLNode(key), ) * 2,
         'remove_key': KeyError,
-        'left': property(lambda self: self),
-        'right': property(lambda self: self),
     },
     attrs={
         'balance': 0,
