@@ -1,9 +1,26 @@
-from bisect import bisect_left
-
 from .node import Node
 from .sentinel import sentinel
+from ..sets import AVLTree
 
 NOT_KEY = sentinel(name='NotKey', repr='NOT_KEY')
+
+
+def successor(key, bst):
+    """Return the least key greater or equal to `key[:1]` in the binary search tree `bst` or None.
+    """
+    key = key[:1]
+    least_greatest, current = None, bst.root
+
+    while current:
+        if key == current.key.key:
+            return current.key
+
+        if key < current.key.key:
+            least_greatest, current = current.key, current.left
+        else:
+            current = current.right
+
+    return least_greatest
 
 
 class RadixNode(Node):
@@ -12,9 +29,10 @@ class RadixNode(Node):
     __slots__ = 'key', 'parent', 'children', 'value',
 
     def __init__(self, key='', value=NOT_KEY, parent=None):
-        super().__init__(key)
-        self.value = value
+        self.key = key
         self.parent = parent
+        self.children = AVLTree()
+        self.value = value
 
     def __len__(self):
         return len(self.key)
@@ -67,15 +85,13 @@ class RadixNode(Node):
         if not key:
             if self.is_key:
                 return self.value
+
             raise KeyError(key)
 
-        children = self.children
+        if (succ := successor(key, self.children)) and (n := len(succ)) == succ.matchlen(key):
+            return succ.find( key[n:] )
 
-        i = bisect_left(children, key)
-        if i == len(children) or len(child := children[i]) != child.matchlen(key):
-            raise KeyError(key)
-
-        return child.find(key[len(child):])
+        raise KeyError(key)
 
     def add(self, key, value):
         """
@@ -92,18 +108,14 @@ class RadixNode(Node):
             finally:
                 self.value = value
 
-        children = self.children
-
-        i = bisect_left(children, key)
-        if i == len(children) or (n := children[i].matchlen(key)) == 0:
-            children.insert(i, RadixNode(key, value, self))
+        if not (succ := successor(key, self.children)) or (n := succ.matchlen(key)) == 0:
+            self.children.add( RadixNode(key, value, self) )
             return True
 
-        child = children[i]
-        if n < len(child):
-            child.split(n)
+        if n < len(succ):
+            succ.split(n)
 
-        return child.add(key[n:], value)
+        return succ.add(key[n:], value)
 
     def split(self, n):
         """
@@ -111,12 +123,13 @@ class RadixNode(Node):
         with the suffix. The new node adopts this node's children.
         """
         new_node = RadixNode(self.key[n:], self.value, self)
-        new_node.children = self.children
+        self.children, new_node.children = new_node.children, self.children
+
         for child in new_node.children:
             child.parent = new_node
 
+        self.children.add(new_node)
         self.key = self.key[:n]
-        self.children = [ new_node ]
         self.value = NOT_KEY
 
     def delete(self, key):
@@ -135,12 +148,10 @@ class RadixNode(Node):
                 self.parent.join()
             return
 
-        children = self.children
-        i = bisect_left(children, key)
-        if i == len(children) or len(child := children[i]) != child.matchlen(key):
-            raise KeyError(key)
+        if (succ := successor(key, self.children)) and (n := len(succ)) == succ.matchlen(key):
+            return succ.delete( key[n:] )
 
-        child.delete(key[len(child):])
+        raise KeyError(key)
 
     def join(self):
         """Re-join lonely children to their parent.
@@ -158,7 +169,7 @@ class RadixNode(Node):
             child.parent = self
 
     def __lt__(self, other):
-        return self and other and self.key[0] < other[0]
+        return self.key[:1] < other.key[:1]
 
     def __repr__(self):
         return f'{type(self).__name__}(key={self.key!r}, value={self.value!r})'
