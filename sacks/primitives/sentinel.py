@@ -6,6 +6,7 @@ def sentinel(name='', default=None, repr='SENTINEL', abc=None, methods=None, att
     Build a better sentinel!
         * Modifying attributes of this object does nothing (with no errors).
         * Abstract methods in `abc` (an abstract base class) not provided in `methods` will return `default`.
+        * If a value in `methods` is `"identity"` a property that returns the sentinel will be provided.
         * If a value in `methods` is `"default_iter"` a default iterator will be provided.
         * If a value in `methods` is a subclass of `Exception` a default function that raises will be provided.
 
@@ -69,6 +70,10 @@ def sentinel(name='', default=None, repr='SENTINEL', abc=None, methods=None, att
     attrs = attrs or { }
     methods = methods or { }
 
+    @property
+    def identity(self):
+        return self
+
     def default_iter(self):
         return
         yield
@@ -80,7 +85,9 @@ def sentinel(name='', default=None, repr='SENTINEL', abc=None, methods=None, att
         return error_raiser
 
     for key, value in methods.items():
-        if value == 'default_iter':
+        if value == 'identity':
+            methods[key] = identity
+        elif value == 'default_iter':
             methods[key] = default_iter
         elif isinstance(value, type) and issubclass(value, Exception):
             methods[key] = error_factory(value)
