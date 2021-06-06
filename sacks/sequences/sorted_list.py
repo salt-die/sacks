@@ -12,7 +12,7 @@ def pair_sum(iterator):
 
 
 class SortedList(MutableSet, Sequence):
-    """A ordered sequence using Python's built-in types. (A slim version of https://github.com/grantjenks/python-sortedcontainers/.)
+    """An ordered sequence using Python's built-in types. (A slim version of https://github.com/grantjenks/python-sortedcontainers/.)
     """
     __slots__ = '_lists', '_maxes', '_weights', '_len', '_load',
 
@@ -157,6 +157,8 @@ class SortedList(MutableSet, Sequence):
         self._len -= 1
 
     def pop(self, index=-1):
+        """Remove and return item at index.
+        """
         lists = self._lists
 
         if index == -1:
@@ -174,6 +176,8 @@ class SortedList(MutableSet, Sequence):
             self._len -= 1
 
     def _coord(self, index):
+        """Return the pair (i, j) such that `_lists[i][j]` has given index.
+        """
         if not isinstance(index, int):
             raise TypeError(f'index must be int, not {type(index).__name__}')
 
