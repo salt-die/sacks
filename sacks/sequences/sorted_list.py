@@ -18,13 +18,13 @@ class SortedList(MutableSet, Sequence):
 
     DEFAULT_LOAD = 10
 
-    def __init__(self, iterable=(), *, load=None):
+    def __init__(self, iterable=(), *, load=DEFAULT_LOAD):
         self._lists = []
         self._maxes = Column(-1, self._lists)
         self._weights = []
 
         self._len = 0
-        self._load = load or self.DEFAULT_LOAD
+        self._load = load
 
         self |= iterable
 
