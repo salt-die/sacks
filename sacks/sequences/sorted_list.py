@@ -12,6 +12,8 @@ def pair_sum(iterator):
 
 
 class SortedList(MutableSet, Sequence):
+    """A ordered sequence using Python's built-in types. (A slim version of https://github.com/grantjenks/python-sortedcontainers/.)
+    """
     __slots__ = '_lists', '_maxes', '_weights', '_len', '_load',
 
     DEFAULT_LOAD = 10
@@ -154,13 +156,30 @@ class SortedList(MutableSet, Sequence):
         self._shrink(i)
         self._len -= 1
 
+    def pop(self, index=-1):
+        lists = self._lists
+
+        if index == -1:
+            i, j = len(lists) - 1, -1
+        elif index == 0:
+            i, j = 0, 0
+        else:
+            i, j = self._coord(index)
+
+        try:
+            return lists[i][j]
+        finally:
+            del lists[i][j]
+            self._shrink(i)
+            self._len -= 1
+
     def _coord(self, index):
         if not isinstance(index, int):
-            raise KeyError(index)
+            raise TypeError(f'index must be int, not {type(index).__name__}')
 
         _, j, _ = slice(index).indices(len(self))
         if j >= len(self):
-            raise KeyError(index)
+            raise IndexError('index out of range')
 
         weights = self._weights
 
@@ -179,9 +198,19 @@ class SortedList(MutableSet, Sequence):
         return i, j
 
     def _build_weights(self):
-        weights = self._weights
-        weights.clear()
+        """
+        Each length of a list in _lists is a leaf in a binary-tree (padded with 0s until the number of
+        leaves is equal to the nearest power of 2). Parent nodes are added between consecutive leaves with
+        weight equal to the sum of their children.  Similarly, parents of consecutive parents are added,
+        until a single root is reached.
 
+        The last item of `_weights` is the level of the tree.
+
+        Nodes on level i start at index -1 << i + 1. (Level 0 is the root with weight equal to length of the
+        sorted list.)
+
+        """
+        weights = self._weights
         lists = self._lists
 
         n_lists = len(lists)
