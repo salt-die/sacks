@@ -169,7 +169,7 @@ class SortedList(MutableSet, Sequence):
         lists = self._lists
 
         if len(lists[i]) < self._load >> 1 and len(lists) > 1:
-            i = min(i, 1)
+            i = max(i, 1)
 
             lists[i - 1].extend(lists[i])
 
@@ -177,6 +177,7 @@ class SortedList(MutableSet, Sequence):
             self._weights.clear()
 
             self._expand(i - 1)
+
         else:
             self._weight_update(i, -1)
 
