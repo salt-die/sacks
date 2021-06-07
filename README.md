@@ -29,6 +29,7 @@ An odd collection of odd collections!
     * BinarySearchTree - A binary tree with O(log n) containment, addition and deletion of items.
     * BloomFilter - A memory-efficient data structure with probabalistic membership checks.  (requires `bitarray`)
     * DisjointSetForest (or UnionFind) - A collection of disjoint sets with very fast `union` and `find` operations.
+    * MultiSetch - A multiset with choice. Exposes a sequence of the items of the set, `as_sequence`, for use with `random` module.
     * OrderedSet - An ordered set.
     * RefinementPartition - A collection of disjoint subsets with very fast refinement.  The dual of UnionFind.
     * Setch - Set with choice. Exposes a sequence of the items of the set, `as_sequence`, for use with `random` module.
