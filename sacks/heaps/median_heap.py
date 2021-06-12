@@ -27,6 +27,10 @@ class MedianHeap:
     def __len__(self):
         return len(self._maxheap) + len(self._minheap)
 
+    def __iter__(self):
+        yield from self._maxheap
+        yield from self._minheap
+
     @property
     def median(self):
         maxheap = self._maxheap
@@ -36,6 +40,16 @@ class MedianHeap:
             return minheap[0]
 
         return maxheap[0]
+
+    def min(self):
+        maxheap = self._maxheap
+        n = len(maxheap)
+        return min(maxheap[i] for i in range(n//2, n))
+
+    def max(self):
+        minheap = self._minheap
+        n = len(minheap)
+        return max(minheap[i] for i in range(n//2, n))
 
     def heappop(self):
         maxheap = self._maxheap
