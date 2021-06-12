@@ -45,13 +45,13 @@ class MedianHeap:
     def min(self):
         maxheap = self._maxheap
         n = len(maxheap)
-        return min(maxheap[i] for i in range(n//2, n))
+        return min(maxheap[i] for i in range(n >> 1, n))
 
     @property
     def max(self):
         minheap = self._minheap
         n = len(minheap)
-        return max(minheap[i] for i in range(n//2, n))
+        return max(minheap[i] for i in range(n >> 1, n))
 
     def heappop(self):
         maxheap = self._maxheap
