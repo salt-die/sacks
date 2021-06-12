@@ -4,6 +4,7 @@ An odd collection of odd collections!
 
 * heaps
     * FibonacciHeap - A priority queue consisting of heap-ordered trees.
+    * MedianHeap - Median heap implemented using two builtin lists.
     * MeldableHeap - A heap-ordered binary tree with O(ln n) worst-case performance with small constant factors.
     * PairingHeap - A simple heap-ordered tree with excellent practical performance.
 * iterables
