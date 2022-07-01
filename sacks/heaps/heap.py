@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 from collections.abc import Sized
-from functools import wraps
 
 from ..primitives.sentinel import sentinel
 
@@ -37,13 +36,11 @@ class Heap(ABC, Sized):
     def heappop(self):
         """Pop the smallest item off the heap, maintaining the heap invariant.
         """
-        pass
 
     @abstractmethod
     def heappush(self, key):
         """Push item onto heap, maintaining the heap invariant.
         """
-        pass
 
     @property
     def min(self):
@@ -54,7 +51,9 @@ class Heap(ABC, Sized):
 
 
 class DeletedEntryError(Exception):
-    ...
+    """
+    Raised when trying to perform operations on deleted entries.
+    """
 
 
 class Entry:
@@ -73,22 +72,22 @@ class Entry:
     @property
     def key(self):
         if self.is_deleted:
-            raise DeletedEntryError
+            raise DeletedEntryError("entry deleted")
 
         return self._node.key
 
     def decrease_key(self, key):
         if self.is_deleted:
-            raise DeletedEntryError
+            raise DeletedEntryError("entry deleted")
 
         if key > self.key:
-            raise keyError(f'{key} greater than {self.key}')
+            raise KeyError(f'{key} greater than {self.key}')
 
         self._heap.decrease_key(self._node, key)
 
     def delete(self):
         if self.is_deleted:
-            raise DeletedEntryError
+            raise DeletedEntryError("entry already deleted")
 
         self.decrease_key(NEG_INF)
         self._heap.heappop()
