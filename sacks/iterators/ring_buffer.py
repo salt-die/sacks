@@ -1,6 +1,8 @@
 from collections.abc import Iterator, Sized
 
-NO_DEFAULT = object()
+from ..primitives.sentinel import sentinel
+
+NO_DEFAULT = sentinel("NO_DEFAULT", repr="<no default>")
 
 
 class RingBuffer(Iterator, Sized):
