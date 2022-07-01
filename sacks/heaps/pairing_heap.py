@@ -1,4 +1,4 @@
-from .heap import Heap, Entry
+from .heap import Heap
 from ..primitives.node import SlotNode
 
 def meld(a, b):
