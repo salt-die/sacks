@@ -1,28 +1,26 @@
-from heapq import (
-    heappop as heappop_min,
-    heappush as heappush_min,
-    _heappop_max as heappop_max,
-    _siftdown_max,
-)
+from heapq import _heappop_max as heappop_max
+from heapq import _siftdown_max
+from heapq import heappop as heappop_min
+from heapq import heappush as heappush_min
+
 
 def heappush_max(heap, item):
-    """Push item onto a maxheap, maintaining the heap invariant.
-    """
+    """Push item onto a maxheap, maintaining the heap invariant."""
     heap.append(item)
     _siftdown_max(heap, 0, len(heap) - 1)
 
 
 class MedianHeap:
-    """Median heap implemented using two builtin lists.
-    """
-    __slots__ = '_maxheap', '_minheap',
+    """Median heap implemented using two builtin lists."""
+
+    __slots__ = ("_maxheap", "_minheap")
 
     def __init__(self, iterable=()):
-        self._maxheap = [ ]
-        self._minheap = [ ]
+        self._maxheap = []
+        self._minheap = []
 
         for item in iterable:
-            self.heappush(iterable)
+            self.heappush(item)
 
     def __len__(self):
         return len(self._maxheap) + len(self._minheap)
@@ -80,4 +78,4 @@ class MedianHeap:
             heappush_max(maxheap, heappop_min(minheap))
 
     def __repr__(self):
-        return f'{type(self).__name__}({self._maxheap!r}, {self._minheap!r})'
+        return f"{type(self).__name__}({self._maxheap!r}, {self._minheap!r})"
